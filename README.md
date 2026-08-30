@@ -50,7 +50,12 @@ VaultFactory
   see research notes), `IDIAOracle` (DIA's standard `getValue(key)`
   key/value feed interface).
 - **`contracts/mocks/`** — test doubles for the router, oracle and ERC-20
-  base/quote assets, used only by the test suite.
+  base/quote assets, used only by the test suite (and `scripts/deploy-local.js`,
+  below).
+- **`frontend/`** — Next.js + wagmi/viem dashboard: connect a wallet, browse
+  deployed vaults, deposit/withdraw. See `frontend/README.md` for local
+  development (against a Hardhat node, since nothing's on X1 yet) and
+  Vercel deployment setup.
 
 ## What's intentionally not here yet
 
@@ -71,6 +76,16 @@ VaultFactory
 npm install
 npx hardhat compile
 npx hardhat test
+```
+
+`scripts/deploy-local.js` deploys the full mock stack (base asset, WX1,
+DIA oracle mock, Ecodex router mock, factory, one vault) to a local Hardhat
+node — useful for exercising `frontend/` against real contract calls
+before anything is deployed to X1 itself:
+
+```bash
+npx hardhat node                                          # separate terminal
+npx hardhat run scripts/deploy-local.js --network localhost
 ```
 
 Requires Node.js and npm. Solidity 0.8.24, OpenZeppelin Contracts v5,
