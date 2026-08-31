@@ -5,6 +5,16 @@ wallet, browse deployed vaults, deposit into and withdraw from one. Built
 with wagmi + viem for on-chain reads/writes (no WalletConnect Cloud project
 ID required — it only uses the browser's injected wallet, e.g. MetaMask).
 
+## Preview (demo) mode
+
+When `NEXT_PUBLIC_VAULT_FACTORY_ADDRESS` is unset — the current state, since
+nothing is deployed to X1 EcoChain yet — the app renders a set of clearly
+labelled **sample** vaults so the interface can be demonstrated. Every view
+carrying sample figures shows a banner saying so, each vault carries a
+"Sample" tag, and deposits/withdrawals are disabled, so preview output is
+never mistakable for real on-chain activity. Setting the env var to a real
+factory switches the whole app to live on-chain reads and writes.
+
 ## Local development
 
 The contracts aren't deployed to X1 EcoChain yet (see

@@ -2,16 +2,21 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useReadContracts } from "wagmi";
-import { ConnectButton } from "@/components/ConnectButton";
+import { useReadContract, useReadContracts } from "wagmi";
+import { Header } from "@/components/Header";
+import { DemoBanner, SampleTag } from "@/components/DemoBanner";
 import { DepositForm } from "@/components/DepositForm";
 import { WithdrawForm } from "@/components/WithdrawForm";
-import { erc20Abi, vaultAbi } from "@/lib/abis";
-import { formatToken } from "@/lib/format";
+import { RiskCaps } from "@/components/RiskCaps";
+import { HeroFigure, StatTile } from "@/components/StatTile";
+import { erc20Abi, riskManagerAbi, vaultAbi } from "@/lib/abis";
+import { getDemoVault, IS_DEMO } from "@/lib/demo";
+import { drawdownBps, formatBps, formatCompact, formatToken, shortenAddress } from "@/lib/format";
 
 export default function VaultPage() {
   const params = useParams<{ address: string }>();
   const vaultAddress = params.address as `0x${string}`;
+  const demo = IS_DEMO ? getDemoVault(vaultAddress) : undefined;
 
   const { data: core } = useReadContracts({
     contracts: [
@@ -21,86 +26,184 @@ export default function VaultPage() {
       { address: vaultAddress, abi: vaultAbi, functionName: "navPerShare" },
       { address: vaultAddress, abi: vaultAbi, functionName: "highWaterMark" },
       { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps" },
+      { address: vaultAddress, abi: vaultAbi, functionName: "riskManager" },
     ],
+    query: { enabled: !IS_DEMO },
   });
 
-  const [baseAssetAddress, shareTokenAddress, nav, navPerShare, highWaterMark, performanceFeeBps] =
-    (core?.map((d) => d.result) ?? []) as [
-      `0x${string}` | undefined,
-      `0x${string}` | undefined,
-      bigint | undefined,
-      bigint | undefined,
-      bigint | undefined,
-      bigint | undefined,
-    ];
+  const [
+    baseAssetAddress,
+    shareTokenAddress,
+    onChainNav,
+    onChainNavPerShare,
+    onChainHwm,
+    onChainFeeBps,
+    riskManagerAddress,
+  ] = (core?.map((d) => d.result) ?? []) as [
+    `0x${string}` | undefined,
+    `0x${string}` | undefined,
+    bigint | undefined,
+    bigint | undefined,
+    bigint | undefined,
+    bigint | undefined,
+    `0x${string}` | undefined,
+  ];
 
   const { data: tokenInfo } = useReadContracts({
     contracts: [
       { address: baseAssetAddress, abi: erc20Abi, functionName: "decimals" },
       { address: baseAssetAddress, abi: erc20Abi, functionName: "symbol" },
       { address: shareTokenAddress, abi: erc20Abi, functionName: "symbol" },
+      { address: shareTokenAddress, abi: erc20Abi, functionName: "totalSupply" },
     ],
-    query: { enabled: Boolean(baseAssetAddress && shareTokenAddress) },
+    query: { enabled: !IS_DEMO && Boolean(baseAssetAddress && shareTokenAddress) },
   });
 
-  const [baseDecimals, baseSymbol, shareSymbol] = (tokenInfo?.map((d) => d.result) ?? []) as [
-    number | undefined,
-    string | undefined,
-    string | undefined,
-  ];
+  const [baseDecimals, onChainBaseSymbol, onChainShareSymbol, onChainSupply] =
+    (tokenInfo?.map((d) => d.result) ?? []) as [
+      number | undefined,
+      string | undefined,
+      string | undefined,
+      bigint | undefined,
+    ];
+
+  const { data: onChainCaps } = useReadContract({
+    address: riskManagerAddress,
+    abi: riskManagerAbi,
+    functionName: "caps",
+    query: { enabled: !IS_DEMO && Boolean(riskManagerAddress) },
+  });
+
+  // One shape for both paths, so the view below doesn't branch on demo mode.
+  const nav = demo ? demo.nav : onChainNav;
+  const navPerShare = demo ? demo.navPerShare : onChainNavPerShare;
+  const highWaterMark = demo ? demo.highWaterMark : onChainHwm;
+  const sharesOutstanding = demo ? demo.sharesOutstanding : onChainSupply;
+  const feeBps = demo
+    ? demo.performanceFeeBps
+    : onChainFeeBps !== undefined
+      ? Number(onChainFeeBps)
+      : undefined;
+  const baseSymbol = demo ? demo.baseSymbol : onChainBaseSymbol;
+  const shareSymbol = demo ? demo.shareSymbol : onChainShareSymbol;
+  const caps = demo
+    ? demo.caps
+    : onChainCaps
+      ? {
+          maxPositionSize: onChainCaps[0],
+          maxSingleAssetBps: Number(onChainCaps[1]),
+          maxDrawdownBps: Number(onChainCaps[2]),
+        }
+      : undefined;
+
+  const dd =
+    navPerShare !== undefined && highWaterMark !== undefined
+      ? drawdownBps(navPerShare, highWaterMark)
+      : 0;
+
+  if (IS_DEMO && !demo) {
+    return (
+      <div className="flex min-h-full flex-col">
+        <Header />
+        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
+          <DemoBanner />
+          <p className="mt-8 text-sm text-ink-secondary">
+            No sample vault at this address.{" "}
+            <Link href="/" className="text-accent hover:underline">
+              Back to vaults
+            </Link>
+          </p>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
-      <header className="flex items-center justify-between">
-        <Link href="/" className="text-sm text-black/60 dark:text-white/60 hover:underline">
-          ← Vault
+    <div className="flex min-h-full flex-col">
+      <Header />
+
+      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
+        {IS_DEMO && <DemoBanner />}
+
+        <Link
+          href="/"
+          className={`inline-block text-sm text-ink-muted hover:text-ink ${IS_DEMO ? "mt-8" : ""}`}
+        >
+          ← All vaults
         </Link>
-        <ConnectButton />
-      </header>
 
-      <main className="mt-8">
-        <h1 className="font-mono text-sm text-black/60 dark:text-white/60">{vaultAddress}</h1>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
+            {demo?.name ?? (shareSymbol ? `${shareSymbol} vault` : "Vault")}
+          </h1>
+          {demo && <SampleTag />}
+          <code className="rounded-md bg-surface-2 px-2 py-1 font-mono text-xs text-ink-muted">
+            {shortenAddress(vaultAddress)}
+          </code>
+        </div>
+        {demo && <p className="mt-1 text-sm text-ink-muted">{demo.strategy}</p>}
 
-        <dl className="mt-4 grid grid-cols-2 gap-4 rounded-lg border border-black/10 dark:border-white/15 p-4 sm:grid-cols-4">
-          <div>
-            <dt className="text-xs text-black/50 dark:text-white/50">NAV</dt>
-            <dd className="mt-1">
-              {formatToken(nav, baseDecimals ?? 18)} {baseSymbol}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs text-black/50 dark:text-white/50">NAV / share</dt>
-            <dd className="mt-1">{formatToken(navPerShare, baseDecimals ?? 18)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-black/50 dark:text-white/50">High-water mark</dt>
-            <dd className="mt-1">{formatToken(highWaterMark, baseDecimals ?? 18)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-black/50 dark:text-white/50">Performance fee</dt>
-            <dd className="mt-1">
-              {performanceFeeBps !== undefined ? Number(performanceFeeBps) / 100 : "—"}%
-            </dd>
-          </div>
-        </dl>
+        <section className="mt-8">
+          <HeroFigure
+            label="Net asset value"
+            value={formatCompact(nav, baseDecimals ?? 18)}
+            unit={baseSymbol}
+            sub={`${formatCompact(sharesOutstanding)} ${shareSymbol ?? "shares"} outstanding`}
+          />
+        </section>
 
-        {baseAssetAddress && shareTokenAddress && baseDecimals !== undefined ? (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <DepositForm
-              vaultAddress={vaultAddress}
-              baseAssetAddress={baseAssetAddress}
-              baseAssetDecimals={baseDecimals}
-              baseAssetSymbol={baseSymbol ?? ""}
-            />
-            <WithdrawForm
-              vaultAddress={vaultAddress}
-              shareTokenAddress={shareTokenAddress}
-              shareSymbol={shareSymbol ?? ""}
-            />
+        <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatTile label="NAV / share" value={formatToken(navPerShare, 18, 4)} />
+          <StatTile label="High-water mark" value={formatToken(highWaterMark, 18, 4)} />
+          <StatTile
+            label="Below peak"
+            value={dd > 0 ? `−${(dd / 100).toFixed(2)}%` : "At peak"}
+            sub={dd > 0 ? "no fee until recovered" : "fee accrues on new profit"}
+            tone={dd > 0 ? "warning" : "good"}
+          />
+          <StatTile label="Performance fee" value={formatBps(feeBps)} sub="above high-water mark" />
+        </section>
+
+        <div className="mt-6 grid items-start gap-4 lg:grid-cols-2">
+          <RiskCaps
+            maxPositionSize={caps?.maxPositionSize}
+            maxSingleAssetBps={caps?.maxSingleAssetBps}
+            maxDrawdownBps={caps?.maxDrawdownBps}
+            baseSymbol={baseSymbol}
+          />
+
+          <div className="grid gap-4">
+            {IS_DEMO ? (
+              <div className="rounded-xl border border-border-subtle bg-surface-1 p-5">
+                <h2 className="font-medium text-ink">Deposit &amp; withdraw</h2>
+                <p className="mt-1 text-sm text-ink-muted">
+                  Disabled in preview — this is sample data, not a deployed vault. Once a
+                  <code className="mx-1 font-mono text-xs">VaultFactory</code>
+                  is live on X1 EcoChain, depositors mint shares pro-rata to NAV here and burn them
+                  to withdraw.
+                </p>
+              </div>
+            ) : baseAssetAddress && shareTokenAddress && baseDecimals !== undefined ? (
+              <>
+                <DepositForm
+                  vaultAddress={vaultAddress}
+                  baseAssetAddress={baseAssetAddress}
+                  baseAssetDecimals={baseDecimals}
+                  baseAssetSymbol={baseSymbol ?? ""}
+                />
+                <WithdrawForm
+                  vaultAddress={vaultAddress}
+                  shareTokenAddress={shareTokenAddress}
+                  shareSymbol={shareSymbol ?? ""}
+                />
+              </>
+            ) : (
+              <div className="rounded-xl border border-border-subtle bg-surface-1 p-5 text-sm text-ink-muted">
+                Loading vault…
+              </div>
+            )}
           </div>
-        ) : (
-          <p className="mt-6 text-sm text-black/60 dark:text-white/60">Loading vault…</p>
-        )}
+        </div>
       </main>
     </div>
   );

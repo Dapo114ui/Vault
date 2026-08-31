@@ -105,6 +105,13 @@ export const vaultAbi = [
   },
   {
     type: "function",
+    name: "riskManager",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
     name: "deposit",
     stateMutability: "nonpayable",
     inputs: [{ name: "amount", type: "uint256" }],
@@ -133,6 +140,20 @@ export const vaultAbi = [
       { name: "user", type: "address", indexed: true },
       { name: "sharesIn", type: "uint256", indexed: false },
       { name: "assetsOut", type: "uint256", indexed: false },
+    ],
+  },
+] as const;
+
+export const riskManagerAbi = [
+  {
+    type: "function",
+    name: "caps",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "maxPositionSize", type: "uint256" },
+      { name: "maxSingleAssetBps", type: "uint256" },
+      { name: "maxDrawdownBps", type: "uint256" },
     ],
   },
 ] as const;

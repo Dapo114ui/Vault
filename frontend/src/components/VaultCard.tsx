@@ -3,7 +3,100 @@
 import Link from "next/link";
 import { useReadContract, useReadContracts } from "wagmi";
 import { vaultAbi, erc20Abi } from "@/lib/abis";
-import { formatToken, shortenAddress } from "@/lib/format";
+import { formatBps, formatCompact, formatToken, shortenAddress, drawdownBps } from "@/lib/format";
+import { SampleTag } from "./DemoBanner";
+import type { DemoVault } from "@/lib/demo";
+
+type CardData = {
+  address: string;
+  name?: string;
+  shareSymbol?: string;
+  baseSymbol?: string;
+  strategy?: string;
+  nav?: bigint;
+  navPerShare?: bigint;
+  highWaterMark?: bigint;
+  sharesOutstanding?: bigint;
+  performanceFeeBps?: number;
+  isSample?: boolean;
+};
+
+function VaultCardView({ data }: { data: CardData }) {
+  const dd =
+    data.navPerShare !== undefined && data.highWaterMark !== undefined
+      ? drawdownBps(data.navPerShare, data.highWaterMark)
+      : 0;
+
+  return (
+    <Link
+      href={`/vault/${data.address}`}
+      className="group block rounded-xl border border-border-subtle bg-surface-1 p-5 transition-colors hover:border-border-strong"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="truncate font-semibold text-ink">{data.name ?? "Vault"}</h3>
+            {data.isSample && <SampleTag />}
+          </div>
+          <p className="mt-0.5 truncate text-sm text-ink-muted">
+            {data.strategy ?? shortenAddress(data.address)}
+          </p>
+        </div>
+        {data.shareSymbol && (
+          <span className="shrink-0 rounded-md bg-surface-2 px-2 py-1 font-mono text-xs text-ink-secondary">
+            {data.shareSymbol}
+          </span>
+        )}
+      </div>
+
+      <div className="mt-5 flex items-baseline gap-2">
+        <span className="text-2xl font-semibold text-ink">{formatCompact(data.nav)}</span>
+        <span className="text-sm text-ink-muted">{data.baseSymbol ?? ""} TVL</span>
+      </div>
+
+      <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-border-subtle pt-4 text-sm">
+        <div>
+          <dt className="text-xs text-ink-muted">NAV / share</dt>
+          <dd className="tabular mt-0.5 text-ink">{formatToken(data.navPerShare, 18, 3)}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-ink-muted">Perf. fee</dt>
+          <dd className="tabular mt-0.5 text-ink">{formatBps(data.performanceFeeBps)}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-ink-muted">vs. peak</dt>
+          <dd className="tabular mt-0.5 flex items-center gap-1.5 text-ink">
+            <span
+              aria-hidden
+              className={`h-1.5 w-1.5 shrink-0 rounded-full ${dd > 0 ? "bg-warning" : "bg-good"}`}
+            />
+            {dd > 0 ? `−${(dd / 100).toFixed(1)}%` : "At peak"}
+          </dd>
+        </div>
+      </dl>
+    </Link>
+  );
+}
+
+export function DemoVaultCard({ vault }: { vault: DemoVault }) {
+  return (
+    <VaultCardView
+      data={{
+        address: vault.address,
+        name: vault.name,
+        shareSymbol: vault.shareSymbol,
+        baseSymbol: vault.baseSymbol,
+        strategy: vault.strategy,
+        nav: vault.nav,
+        navPerShare: vault.navPerShare,
+        highWaterMark: vault.highWaterMark,
+        sharesOutstanding: vault.sharesOutstanding,
+        performanceFeeBps: vault.performanceFeeBps,
+        isSample: true,
+      }}
+    />
+  );
+}
 
 export function VaultCard({ vaultAddress }: { vaultAddress: `0x${string}` }) {
   const { data: shareTokenAddress } = useReadContract({
@@ -16,51 +109,38 @@ export function VaultCard({ vaultAddress }: { vaultAddress: `0x${string}` }) {
     contracts: [
       { address: vaultAddress, abi: vaultAbi, functionName: "nav" },
       { address: vaultAddress, abi: vaultAbi, functionName: "navPerShare" },
-      {
-        address: shareTokenAddress,
-        abi: erc20Abi,
-        functionName: "symbol",
-      },
-      {
-        address: shareTokenAddress,
-        abi: erc20Abi,
-        functionName: "totalSupply",
-      },
+      { address: vaultAddress, abi: vaultAbi, functionName: "highWaterMark" },
+      { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps" },
+      { address: shareTokenAddress, abi: erc20Abi, functionName: "symbol" },
+      { address: shareTokenAddress, abi: erc20Abi, functionName: "totalSupply" },
     ],
     query: { enabled: Boolean(shareTokenAddress) },
   });
 
-  const [nav, navPerShare, symbol, totalSupply] = data?.map((d) => d.result) ?? [];
+  const [nav, navPerShare, highWaterMark, performanceFeeBps, shareSymbol, totalSupply] =
+    (data?.map((d) => d.result) ?? []) as [
+      bigint | undefined,
+      bigint | undefined,
+      bigint | undefined,
+      bigint | undefined,
+      string | undefined,
+      bigint | undefined,
+    ];
 
   return (
-    <Link
-      href={`/vault/${vaultAddress}`}
-      className="block rounded-lg border border-black/10 dark:border-white/15 p-4 hover:border-black/30 dark:hover:border-white/40 transition-colors"
-    >
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-sm text-black/60 dark:text-white/60">
-          {shortenAddress(vaultAddress)}
-        </span>
-        {typeof symbol === "string" && (
-          <span className="text-xs rounded-full bg-black/5 dark:bg-white/10 px-2 py-0.5">
-            {symbol}
-          </span>
-        )}
-      </div>
-      <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
-        <div>
-          <dt className="text-black/50 dark:text-white/50">NAV</dt>
-          <dd>{formatToken(nav as bigint | undefined)}</dd>
-        </div>
-        <div>
-          <dt className="text-black/50 dark:text-white/50">NAV / share</dt>
-          <dd>{formatToken(navPerShare as bigint | undefined)}</dd>
-        </div>
-        <div>
-          <dt className="text-black/50 dark:text-white/50">Shares outstanding</dt>
-          <dd>{formatToken(totalSupply as bigint | undefined)}</dd>
-        </div>
-      </dl>
-    </Link>
+    <VaultCardView
+      data={{
+        address: vaultAddress,
+        name: shareSymbol ? `${shareSymbol} vault` : "Vault",
+        shareSymbol,
+        strategy: shortenAddress(vaultAddress),
+        nav,
+        navPerShare,
+        highWaterMark,
+        sharesOutstanding: totalSupply,
+        performanceFeeBps:
+          performanceFeeBps !== undefined ? Number(performanceFeeBps) : undefined,
+      }}
+    />
   );
 }

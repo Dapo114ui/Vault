@@ -79,11 +79,14 @@ export function DepositForm({
   }
 
   return (
-    <div className="rounded-lg border border-black/10 dark:border-white/15 p-4">
-      <h3 className="font-medium">Deposit</h3>
-      <p className="mt-1 text-xs text-black/50 dark:text-white/50">
-        Balance: {formatToken(balance, baseAssetDecimals)} {baseAssetSymbol}
-      </p>
+    <div className="rounded-xl border border-border-subtle bg-surface-1 p-5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="font-medium text-ink">Deposit</h3>
+        <span className="tabular text-xs text-ink-muted">
+          {formatToken(balance, baseAssetDecimals)} {baseAssetSymbol}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-ink-muted">Mints shares pro-rata to current NAV.</p>
       <div className="mt-3 flex gap-2">
         <input
           type="number"
@@ -93,17 +96,23 @@ export function DepositForm({
           onChange={(e) => setAmount(e.target.value)}
           placeholder="0.0"
           disabled={isBusy}
-          className="w-full rounded-md border border-black/15 dark:border-white/20 bg-transparent px-3 py-1.5 text-sm"
+          className="tabular w-full rounded-lg border border-border-subtle bg-surface-2 px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-accent"
         />
         <button
           onClick={handleSubmit}
           disabled={!userAddress || amountBig <= 0n || isBusy}
-          className="whitespace-nowrap rounded-md bg-foreground text-background px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+          className="whitespace-nowrap rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40"
         >
-          {status === "approving" ? "Approving…" : status === "depositing" ? "Depositing…" : needsApproval ? "Approve & Deposit" : "Deposit"}
+          {status === "approving"
+            ? "Approving…"
+            : status === "depositing"
+              ? "Depositing…"
+              : needsApproval
+                ? "Approve & deposit"
+                : "Deposit"}
         </button>
       </div>
-      {error && <p className="mt-2 text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-xs text-critical">{error}</p>}
     </div>
   );
 }
