@@ -79,11 +79,31 @@ Reproduced against a local node before fixing and re-checked after, plus a
 deposit and withdraw driven through the browser (NAV 0 → 250 → 150, shares
 reconciling exactly on-chain).
 
-**Remaining blocker:** find Ecodex's router and DIA's oracle addresses on X1,
+## 2d. First real on-chain round-trip
+
+**Deposit done.** A 0.5 USDT deposit into the vault at
+`0x323fa03BB4437A0962131a405102A37D570A05FD` was made through the deployed
+frontend at block **10310728** by `0x5704…5c2E`: 0.5 USDT in, 0.5 vUSDT
+minted at a NAV/share of 1.0, wallet balance 0.853 → 0.353. The activity
+feed reads it straight back out of the chain's `Deposit` event.
+
+This is the first measurable on-chain activity, and it exercises the whole
+path end to end on a real network — ERC-20 approval, pro-rata share minting,
+NAV accounting against an 18-decimal base asset, and the risk caps rendering
+in the base asset's own units.
+
+**Still to exercise:** a withdrawal. The burn path has been tested locally
+(and in `test/Vault.test.js`) but not yet on X1, so the vault currently holds
+real testnet funds through a path that hasn't been proven on this network.
+Worth doing before the vault holds anything anyone cares about.
+
+## 3. Remaining work
+
+**Blocker:** find Ecodex's router and DIA's oracle addresses on X1,
 verify the real router ABI against `IEcodexRouter`'s assumed Uniswap-V2 shape,
 then redeploy with trading enabled.
 
-## 3. Draft grant application once MVP scope and timeline are firm
+## 4. Draft grant application once MVP scope and timeline are firm
 
 **Not started — blocked on #1's mainnet-timeline follow-up.** The
 application form is at
