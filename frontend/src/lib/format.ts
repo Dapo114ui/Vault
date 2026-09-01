@@ -36,6 +36,37 @@ export function shortenAddress(address: string): string {
  * strategy earns no performance fee until it recovers -- worth surfacing,
  * since it's the number that decides whether a depositor is paying one.
  */
+/** Splits a value for display so the decimals can be de-emphasised. */
+export function splitAmount(
+  value: bigint | undefined,
+  decimals = 18
+): { whole: string; fraction: string } {
+  if (value === undefined) return { whole: "—", fraction: "" };
+  const n = Number(formatUnits(value, decimals));
+  if (!Number.isFinite(n)) return { whole: "—", fraction: "" };
+  const whole = Math.trunc(n).toLocaleString();
+  const fraction = Math.abs(n % 1)
+    .toFixed(2)
+    .slice(1); // ".42"
+  return { whole, fraction };
+}
+
+/**
+ * The vault's return per share since launch: NAV/share started at exactly
+ * 1.0, so this is a realised, on-chain figure -- not a projected APY, which
+ * the contracts neither compute nor promise.
+ */
+export function returnSinceInception(navPerShare: bigint | undefined): number | undefined {
+  if (navPerShare === undefined) return undefined;
+  return (Number(navPerShare) / 1e18 - 1) * 100;
+}
+
+export function formatSignedPercent(pct: number | undefined, digits = 2): string {
+  if (pct === undefined) return "—";
+  const sign = pct > 0 ? "+" : pct < 0 ? "−" : "";
+  return `${sign}${Math.abs(pct).toFixed(digits)}%`;
+}
+
 export function drawdownBps(navPerShare: bigint, highWaterMark: bigint): number {
   if (highWaterMark === 0n || navPerShare >= highWaterMark) return 0;
   return Number(((highWaterMark - navPerShare) * 10_000n) / highWaterMark);

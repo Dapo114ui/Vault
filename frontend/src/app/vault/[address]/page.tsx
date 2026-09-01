@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useReadContract, useReadContracts } from "wagmi";
-import { Header } from "@/components/Header";
 import { DemoBanner, SampleTag } from "@/components/DemoBanner";
 import { DepositForm } from "@/components/DepositForm";
 import { WithdrawForm } from "@/components/WithdrawForm";
@@ -103,33 +102,28 @@ export default function VaultPage() {
 
   if (IS_DEMO && !demo) {
     return (
-      <div className="flex min-h-full flex-col">
-        <Header />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
-          <DemoBanner />
-          <p className="mt-8 text-sm text-ink-secondary">
-            No sample vault at this address.{" "}
-            <Link href="/" className="text-accent hover:underline">
-              Back to vaults
-            </Link>
-          </p>
-        </main>
-      </div>
+      <>
+        <DemoBanner />
+        <p className="mt-8 text-sm text-ink-secondary">
+          No sample vault at this address.{" "}
+          <Link href="/strategies" className="text-accent hover:underline">
+            Back to strategies
+          </Link>
+        </p>
+      </>
     );
   }
 
   return (
-    <div className="flex min-h-full flex-col">
-      <Header />
-
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
+    <>
+      <div>
         {IS_DEMO && <DemoBanner />}
 
         <Link
-          href="/"
+          href="/strategies"
           className={`inline-block text-sm text-ink-muted hover:text-ink ${IS_DEMO ? "mt-8" : ""}`}
         >
-          ← All vaults
+          ← All strategies
         </Link>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -204,7 +198,7 @@ export default function VaultPage() {
             )}
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
