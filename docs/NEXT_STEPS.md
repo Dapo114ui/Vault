@@ -103,12 +103,23 @@ Worth doing before the vault holds anything anyone cares about.
 verify the real router ABI against `IEcodexRouter`'s assumed Uniswap-V2 shape,
 then redeploy with trading enabled.
 
-## 4. Draft grant application once MVP scope and timeline are firm
+## 4. Draft grant application
 
-**Not started — blocked on #1's mainnet-timeline follow-up.** The
-application form is at
-`airtable.com/appMvL5KlSmE9J3I4/paglccI2kQaFErlF3/form`. Worth drafting
-once the mainnet-timeline question from #1 is resolved, since the
-90–120 day delivery plan the application asks for should be phased against
-Ecodex's actual mainnet availability (testnet-first delivery, mainnet
-trading gated on Ecodex's own launch) rather than assumed concurrent.
+**Unblocked.** The mainnet-timeline question that was holding this up is
+answered: X1's Q1 2026 mainnet target has slipped by two to three quarters
+and no new date is public (see `RESEARCH_NOTES.md`). The delivery plan is
+therefore phased — a fixed testnet date the applicant controls, and mainnet
+trading expressed relative to Ecodex's own launch rather than a calendar
+quarter.
+
+Draft lives in `GRANT_APPLICATION.md`. The form is at
+`airtable.com/appMvL5KlSmE9J3I4/paglccI2kQaFErlF3/form`.
+
+Two things to confirm before submitting:
+
+1. **That the program is still accepting applications.** It was announced in
+   October 2025 — about eleven months ago — and while the page still shows
+   "Apply Now", no deadline is published either way.
+2. **The form's actual field list.** The draft is organised around what the
+   program says it evaluates on, not around fields anyone has read; the live
+   form may ask for different cuts of the same material.
