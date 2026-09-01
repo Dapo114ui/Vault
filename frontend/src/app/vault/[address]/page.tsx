@@ -9,6 +9,7 @@ import { WithdrawForm } from "@/components/WithdrawForm";
 import { RiskCaps } from "@/components/RiskCaps";
 import { HeroFigure, StatTile } from "@/components/StatTile";
 import { erc20Abi, riskManagerAbi, vaultAbi } from "@/lib/abis";
+import { ACTIVE_CHAIN_ID } from "@/lib/config";
 import { getDemoVault, IS_DEMO } from "@/lib/demo";
 import { drawdownBps, formatBps, formatCompact, formatToken, shortenAddress } from "@/lib/format";
 
@@ -19,13 +20,13 @@ export default function VaultPage() {
 
   const { data: core } = useReadContracts({
     contracts: [
-      { address: vaultAddress, abi: vaultAbi, functionName: "baseAsset" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "shareToken" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "nav" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "navPerShare" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "highWaterMark" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "riskManager" },
+      { address: vaultAddress, abi: vaultAbi, functionName: "baseAsset", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "shareToken", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "nav", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "navPerShare", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "highWaterMark", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "riskManager", chainId: ACTIVE_CHAIN_ID },
     ],
     query: { enabled: !IS_DEMO },
   });
@@ -50,10 +51,10 @@ export default function VaultPage() {
 
   const { data: tokenInfo } = useReadContracts({
     contracts: [
-      { address: baseAssetAddress, abi: erc20Abi, functionName: "decimals" },
-      { address: baseAssetAddress, abi: erc20Abi, functionName: "symbol" },
-      { address: shareTokenAddress, abi: erc20Abi, functionName: "symbol" },
-      { address: shareTokenAddress, abi: erc20Abi, functionName: "totalSupply" },
+      { address: baseAssetAddress, abi: erc20Abi, functionName: "decimals", chainId: ACTIVE_CHAIN_ID },
+      { address: baseAssetAddress, abi: erc20Abi, functionName: "symbol", chainId: ACTIVE_CHAIN_ID },
+      { address: shareTokenAddress, abi: erc20Abi, functionName: "symbol", chainId: ACTIVE_CHAIN_ID },
+      { address: shareTokenAddress, abi: erc20Abi, functionName: "totalSupply", chainId: ACTIVE_CHAIN_ID },
     ],
     query: { enabled: !IS_DEMO && Boolean(baseAssetAddress && shareTokenAddress) },
   });
@@ -70,6 +71,7 @@ export default function VaultPage() {
     address: riskManagerAddress,
     abi: riskManagerAbi,
     functionName: "caps",
+    chainId: ACTIVE_CHAIN_ID,
     query: { enabled: !IS_DEMO && Boolean(riskManagerAddress) },
   });
 

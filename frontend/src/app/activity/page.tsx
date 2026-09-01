@@ -1,9 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { usePublicClient } from "wagmi";
+import { usePublicClient, useReadContracts } from "wagmi";
 import { parseAbiItem, formatUnits } from "viem";
 import { DemoBanner, SampleTag } from "@/components/DemoBanner";
+import { vaultAbi } from "@/lib/abis";
+import { ACTIVE_CHAIN_ID } from "@/lib/config";
 import { useVaultAddresses } from "@/hooks/useVaults";
 import { DEMO_ACTIVITY, IS_DEMO } from "@/lib/demo";
 import { shortenAddress } from "@/lib/format";
@@ -17,11 +19,32 @@ const EVENTS = [
 /** Bounded lookback -- public RPCs cap eth_getLogs ranges. */
 const LOOKBACK = 50_000n;
 
-const amt = (v: unknown) => (typeof v === "bigint" ? Number(formatUnits(v, 18)).toLocaleString() : "—");
+const amt = (v: unknown, decimals = 18) =>
+  typeof v === "bigint" ? Number(formatUnits(v, decimals)).toLocaleString() : "—";
 
 export default function Activity() {
-  const client = usePublicClient();
+  const client = usePublicClient({ chainId: ACTIVE_CHAIN_ID });
   const { addresses } = useVaultAddresses();
+
+  // Asset amounts in these events are in each vault's own base-asset units;
+  // share amounts are always 18. Formatting both as 18 silently mis-scales
+  // every deposit and withdrawal on a vault whose base asset isn't.
+  const { data: decimalsData } = useReadContracts({
+    contracts: addresses.map((address) => ({
+      address,
+      abi: vaultAbi,
+      functionName: "baseDecimals" as const,
+      chainId: ACTIVE_CHAIN_ID,
+    })),
+    query: { enabled: addresses.length > 0 },
+  });
+
+  const baseDecimalsOf = new Map(
+    addresses.map((address, i) => [
+      address.toLowerCase(),
+      (decimalsData?.[i]?.result as number | undefined) ?? 18,
+    ]),
+  );
 
   const { data: entries, isLoading, error } = useQuery({
     queryKey: ["activity", addresses],
@@ -82,11 +105,12 @@ export default function Activity() {
           entries.map((log, i) => {
             const name = log.eventName as string;
             const args = log.args as Record<string, unknown>;
+            const base = baseDecimalsOf.get(log.address.toLowerCase()) ?? 18;
             const detail =
               name === "Deposit"
-                ? `${amt(args.assetsIn)} in → ${amt(args.sharesOut)} shares`
+                ? `${amt(args.assetsIn, base)} in → ${amt(args.sharesOut)} shares`
                 : name === "Withdraw"
-                  ? `${amt(args.sharesIn)} shares → ${amt(args.assetsOut)} out`
+                  ? `${amt(args.sharesIn)} shares → ${amt(args.assetsOut, base)} out`
                   : `${amt(args.amountIn)} → ${amt(args.amountOut)}`;
             return (
               <Row

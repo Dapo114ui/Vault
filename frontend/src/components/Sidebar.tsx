@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAccount } from "wagmi";
-import { hardhat } from "viem/chains";
-import { x1EcoChain } from "@/lib/config";
+import { useWrongNetwork } from "@/hooks/useNetwork";
+import { useVaultAddresses } from "@/hooks/useVaults";
+import { ACTIVE_CHAIN } from "@/lib/config";
 import { DEMO_VAULTS, IS_DEMO } from "@/lib/demo";
 
 const NAV = [
@@ -15,15 +15,18 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { chain } = useAccount();
+  const { isWrongNetwork } = useWrongNetwork();
+  const { addresses } = useVaultAddresses();
 
-  // Name the network we're actually pointed at, rather than asserting a
-  // deployment that doesn't exist -- X1 mainnet is not live.
+  // Name the network the app actually reads from, not the wallet's -- those
+  // can differ, and the wallet's is the one that's wrong when they do.
   const networkLabel = IS_DEMO
     ? "Preview — no network"
-    : chain?.id === hardhat.id
-      ? "Local Hardhat"
-      : chain?.name ?? x1EcoChain.name;
+    : isWrongNetwork
+      ? `${ACTIVE_CHAIN.name} — wallet elsewhere`
+      : ACTIVE_CHAIN.name;
+
+  const vaultCount = IS_DEMO ? DEMO_VAULTS.length : addresses.length;
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border-subtle bg-surface-1 lg:flex">
@@ -48,7 +51,9 @@ export function Sidebar() {
         <div className="flex items-center gap-2 rounded-lg border border-border-subtle bg-surface-2 px-3 py-2">
           <span
             aria-hidden
-            className={`h-1.5 w-1.5 shrink-0 rounded-full ${IS_DEMO ? "bg-warning" : "bg-good"}`}
+            className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+              IS_DEMO || isWrongNetwork ? "bg-warning" : "bg-good"
+            }`}
           />
           <span className="truncate text-xs text-ink-secondary">{networkLabel}</span>
         </div>
@@ -70,9 +75,9 @@ export function Sidebar() {
             >
               <Icon />
               <span className="flex-1">{label}</span>
-              {label === "Strategies" && IS_DEMO && (
+              {label === "Strategies" && vaultCount > 0 && (
                 <span className="rounded bg-surface-1 px-1.5 text-xs text-ink-muted">
-                  {DEMO_VAULTS.length}
+                  {vaultCount}
                 </span>
               )}
             </Link>

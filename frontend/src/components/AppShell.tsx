@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConnectButton } from "./ConnectButton";
+import { NetworkBanner } from "./NetworkBanner";
 import { Sidebar } from "./Sidebar";
 
 const CRUMB: Record<string, string> = {
@@ -34,6 +35,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
           <ConnectButton />
         </header>
+
+        <NetworkBanner />
 
         <main className="flex-1 px-6 py-8">
           <div className="mx-auto w-full max-w-4xl">{children}</div>

@@ -2,7 +2,7 @@
 
 import { useAccount, useReadContract, useReadContracts } from "wagmi";
 import { erc20Abi, vaultAbi, vaultFactoryAbi } from "@/lib/abis";
-import { VAULT_FACTORY_ADDRESS } from "@/lib/config";
+import { ACTIVE_CHAIN_ID, VAULT_FACTORY_ADDRESS } from "@/lib/config";
 
 /** Every vault the factory has deployed. */
 export function useVaultAddresses() {
@@ -10,6 +10,7 @@ export function useVaultAddresses() {
     address: VAULT_FACTORY_ADDRESS,
     abi: vaultFactoryAbi,
     functionName: "vaultsCount",
+    chainId: ACTIVE_CHAIN_ID,
     query: { enabled: Boolean(VAULT_FACTORY_ADDRESS) },
   });
 
@@ -21,6 +22,7 @@ export function useVaultAddresses() {
       abi: vaultFactoryAbi,
       functionName: "vaults" as const,
       args: [BigInt(i)] as const,
+      chainId: ACTIVE_CHAIN_ID,
     })),
     query: { enabled: count > 0 },
   });
@@ -44,10 +46,10 @@ export function usePortfolio() {
 
   const { data: vaultState } = useReadContracts({
     contracts: addresses.flatMap((vault) => [
-      { address: vault, abi: vaultAbi, functionName: "nav" as const },
-      { address: vault, abi: vaultAbi, functionName: "navPerShare" as const },
-      { address: vault, abi: vaultAbi, functionName: "shareToken" as const },
-      { address: vault, abi: vaultAbi, functionName: "baseDecimals" as const },
+      { address: vault, abi: vaultAbi, functionName: "nav" as const, chainId: ACTIVE_CHAIN_ID },
+      { address: vault, abi: vaultAbi, functionName: "navPerShare" as const, chainId: ACTIVE_CHAIN_ID },
+      { address: vault, abi: vaultAbi, functionName: "shareToken" as const, chainId: ACTIVE_CHAIN_ID },
+      { address: vault, abi: vaultAbi, functionName: "baseDecimals" as const, chainId: ACTIVE_CHAIN_ID },
     ]),
     query: { enabled: addresses.length > 0 },
   });
@@ -66,6 +68,7 @@ export function usePortfolio() {
       abi: erc20Abi,
       functionName: "balanceOf" as const,
       args: userAddress ? ([userAddress] as const) : undefined,
+      chainId: ACTIVE_CHAIN_ID,
     })),
     query: { enabled: Boolean(userAddress) && perVault.every((v) => Boolean(v.shareToken)) },
   });

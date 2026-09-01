@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...except the example, which holds only public NEXT_PUBLIC_* values and is
+# the one place the required variables are written down.
+!.env.example
 
 # vercel
 .vercel

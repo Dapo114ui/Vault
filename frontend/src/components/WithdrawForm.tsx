@@ -5,7 +5,8 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { erc20Abi, vaultAbi } from "@/lib/abis";
-import { wagmiConfig } from "@/lib/config";
+import { ACTIVE_CHAIN_ID, wagmiConfig } from "@/lib/config";
+import { useWrongNetwork } from "@/hooks/useNetwork";
 import { formatToken, parseToken } from "@/lib/format";
 
 export function WithdrawForm({
@@ -18,6 +19,7 @@ export function WithdrawForm({
   shareSymbol: string;
 }) {
   const { address: userAddress } = useAccount();
+  const { isWrongNetwork } = useWrongNetwork();
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState("");
   const [status, setStatus] = useState<"idle" | "withdrawing" | "error">("idle");
@@ -29,6 +31,7 @@ export function WithdrawForm({
     abi: erc20Abi,
     functionName: "balanceOf",
     args: userAddress ? [userAddress] : undefined,
+    chainId: ACTIVE_CHAIN_ID,
     query: { enabled: Boolean(userAddress) },
   });
 
@@ -44,6 +47,7 @@ export function WithdrawForm({
         abi: vaultAbi,
         functionName: "withdraw",
         args: [amountBig],
+        chainId: ACTIVE_CHAIN_ID,
       });
       await waitForTransactionReceipt(wagmiConfig, { hash });
       await queryClient.invalidateQueries();
@@ -77,10 +81,10 @@ export function WithdrawForm({
         />
         <button
           onClick={handleSubmit}
-          disabled={!userAddress || amountBig <= 0n || status === "withdrawing"}
+          disabled={!userAddress || isWrongNetwork || amountBig <= 0n || status === "withdrawing"}
           className="whitespace-nowrap rounded-lg border border-border-strong px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-40"
         >
-          {status === "withdrawing" ? "Withdrawing…" : "Withdraw"}
+          {isWrongNetwork ? "Wrong network" : status === "withdrawing" ? "Withdrawing…" : "Withdraw"}
         </button>
       </div>
       {error && <p className="mt-2 text-xs text-critical">{error}</p>}

@@ -55,15 +55,33 @@ fixed and covered by tests:
 
 Also added `scripts/deploy-x1.js` for real-network deployment.
 
-**Remaining blockers, in order:**
+**Blockers 1–3 are now done.** X1's testnet chain ID (`10778`) and RPC are
+confirmed by a live deployment; a factory and a base-asset-only vault are
+deployed and the Vercel app is out of preview mode, reading them. Addresses
+are in `DEPLOYMENTS.md`.
 
-1. Confirm X1's testnet RPC/chain ID (candidates in `hardhat.config.js`).
-2. Fund a deployer from the testnet faucet.
-3. Deploy factory + a base-asset-only vault → set the three
-   `NEXT_PUBLIC_*` vars in Vercel → the app leaves preview mode and is
-   genuinely usable.
-4. Find Ecodex's router and DIA's oracle addresses on X1, verify the real
-   router ABI, then redeploy with trading enabled.
+## 2c. Frontend was reading the wrong chain
+
+**Fixed.** With the three `NEXT_PUBLIC_*` vars set, the live app still showed
+"Strategies 0" and an empty strategies page. Cause: wagmi's config listed the
+local Hardhat chain first, and contract reads that don't name a chain fall
+back to the config's first chain — so every read in the deployed app went to
+`http://127.0.0.1:8545` in the visitor's own browser. Two changes:
+
+- The configured chain is now first whenever `NEXT_PUBLIC_CHAIN_ID` is set,
+  and every read names `ACTIVE_CHAIN_ID` explicitly rather than inheriting
+  one.
+- A wallet on a different network is now visible: a banner offering to switch,
+  a sidebar chip that says so, and disabled deposit/withdraw buttons. Reads no
+  longer depend on where the wallet is pointed, so vault data loads either way.
+
+Reproduced against a local node before fixing and re-checked after, plus a
+deposit and withdraw driven through the browser (NAV 0 → 250 → 150, shares
+reconciling exactly on-chain).
+
+**Remaining blocker:** find Ecodex's router and DIA's oracle addresses on X1,
+verify the real router ABI against `IEcodexRouter`'s assumed Uniswap-V2 shape,
+then redeploy with trading enabled.
 
 ## 3. Draft grant application once MVP scope and timeline are firm
 

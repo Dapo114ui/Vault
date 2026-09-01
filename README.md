@@ -8,12 +8,13 @@ own funds through [Ecodex](https://x1ecochain.com/) (X1's native DEX);
 profit above the vault's all-time-high NAV/share is charged a performance
 fee at withdrawal, with hard, on-chain risk caps enforced on every trade.
 
-This repo is the contract-architecture draft referenced in the project's
-next steps: scope the modules, get pro-rata accounting and risk caps under
-test, and use that as the basis for the grant application and a firmer
-90–120 day delivery timeline. See `docs/RESEARCH_NOTES.md` for the market
-research behind the scoping decisions and `docs/NEXT_STEPS.md` for the
-live status of the plan's open items.
+A deposit-and-withdraw-only v1 is **live on X1's Maculatus testnet**
+(chain ID `10778`) — addresses in `docs/DEPLOYMENTS.md`. Trading through
+Ecodex is not enabled yet; see "What's intentionally not here yet" below.
+
+See `docs/RESEARCH_NOTES.md` for the market research behind the scoping
+decisions and `docs/NEXT_STEPS.md` for the live status of the plan's open
+items.
 
 ## Architecture
 
@@ -79,10 +80,6 @@ setting them takes the frontend out of preview mode.
 
 ## What's intentionally not here yet
 
-- **Confirmed X1 network parameters.** `hardhat.config.js` defaults to
-  chain ID `10778` / `https://maculatus-rpc.x1eco.com` from public sources,
-  unverified against a live RPC handshake — and another unrelated network
-  also markets itself as "X1". Confirm before deploying.
 - **Ecodex router and DIA oracle addresses on X1**, and with them the real
   router ABI — `IEcodexRouter` still assumes a Uniswap-V2 shape. Trading
   is blocked on these; deposits and withdrawals are not.
@@ -118,5 +115,6 @@ a binary from `binaries.soliditylang.org`, which some sandboxes block.
 Network config for `x1Testnet` / `x1Mainnet` in `hardhat.config.js` reads
 `X1_TESTNET_RPC_URL`, `X1_TESTNET_CHAIN_ID`, `X1_MAINNET_RPC_URL`,
 `X1_MAINNET_CHAIN_ID` and `DEPLOYER_PRIVATE_KEY` from a local `.env` file
-(not committed) — none of these are confirmed values yet, see
-`docs/RESEARCH_NOTES.md`.
+(not committed). The testnet defaults are confirmed — they are what the
+deployment in `docs/DEPLOYMENTS.md` was made through. The mainnet ones are
+not; X1 mainnet is not live (see `docs/RESEARCH_NOTES.md`).

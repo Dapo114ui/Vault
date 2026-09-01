@@ -5,7 +5,8 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { erc20Abi, vaultAbi } from "@/lib/abis";
-import { wagmiConfig } from "@/lib/config";
+import { ACTIVE_CHAIN_ID, wagmiConfig } from "@/lib/config";
+import { useWrongNetwork } from "@/hooks/useNetwork";
 import { formatToken, parseToken } from "@/lib/format";
 
 export function DepositForm({
@@ -20,6 +21,7 @@ export function DepositForm({
   baseAssetSymbol: string;
 }) {
   const { address: userAddress } = useAccount();
+  const { isWrongNetwork } = useWrongNetwork();
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState("");
   const [status, setStatus] = useState<"idle" | "approving" | "depositing" | "error">("idle");
@@ -31,6 +33,7 @@ export function DepositForm({
     abi: erc20Abi,
     functionName: "balanceOf",
     args: userAddress ? [userAddress] : undefined,
+    chainId: ACTIVE_CHAIN_ID,
     query: { enabled: Boolean(userAddress) },
   });
 
@@ -39,6 +42,7 @@ export function DepositForm({
     abi: erc20Abi,
     functionName: "allowance",
     args: userAddress ? [userAddress, vaultAddress] : undefined,
+    chainId: ACTIVE_CHAIN_ID,
     query: { enabled: Boolean(userAddress) },
   });
 
@@ -57,6 +61,7 @@ export function DepositForm({
           abi: erc20Abi,
           functionName: "approve",
           args: [vaultAddress, amountBig],
+          chainId: ACTIVE_CHAIN_ID,
         });
         await waitForTransactionReceipt(wagmiConfig, { hash });
         await queryClient.invalidateQueries();
@@ -67,6 +72,7 @@ export function DepositForm({
         abi: vaultAbi,
         functionName: "deposit",
         args: [amountBig],
+        chainId: ACTIVE_CHAIN_ID,
       });
       await waitForTransactionReceipt(wagmiConfig, { hash });
       await queryClient.invalidateQueries();
@@ -100,16 +106,18 @@ export function DepositForm({
         />
         <button
           onClick={handleSubmit}
-          disabled={!userAddress || amountBig <= 0n || isBusy}
+          disabled={!userAddress || isWrongNetwork || amountBig <= 0n || isBusy}
           className="whitespace-nowrap rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40"
         >
-          {status === "approving"
-            ? "Approving…"
-            : status === "depositing"
-              ? "Depositing…"
-              : needsApproval
-                ? "Approve & deposit"
-                : "Deposit"}
+          {isWrongNetwork
+            ? "Wrong network"
+            : status === "approving"
+              ? "Approving…"
+              : status === "depositing"
+                ? "Depositing…"
+                : needsApproval
+                  ? "Approve & deposit"
+                  : "Deposit"}
         </button>
       </div>
       {error && <p className="mt-2 text-xs text-critical">{error}</p>}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useReadContracts } from "wagmi";
 import { vaultAbi, erc20Abi } from "@/lib/abis";
+import { ACTIVE_CHAIN_ID } from "@/lib/config";
 import { formatBps, formatCompact, formatToken, shortenAddress, drawdownBps } from "@/lib/format";
 import { SampleTag } from "./DemoBanner";
 import type { DemoVault } from "@/lib/demo";
@@ -106,8 +107,8 @@ export function DemoVaultCard({ vault }: { vault: DemoVault }) {
 export function VaultCard({ vaultAddress }: { vaultAddress: `0x${string}` }) {
   const { data: tokens } = useReadContracts({
     contracts: [
-      { address: vaultAddress, abi: vaultAbi, functionName: "shareToken" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "baseAsset" },
+      { address: vaultAddress, abi: vaultAbi, functionName: "shareToken", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "baseAsset", chainId: ACTIVE_CHAIN_ID },
     ],
   });
 
@@ -118,14 +119,14 @@ export function VaultCard({ vaultAddress }: { vaultAddress: `0x${string}` }) {
 
   const { data } = useReadContracts({
     contracts: [
-      { address: vaultAddress, abi: vaultAbi, functionName: "nav" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "navPerShare" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "highWaterMark" },
-      { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps" },
-      { address: shareTokenAddress, abi: erc20Abi, functionName: "symbol" },
-      { address: shareTokenAddress, abi: erc20Abi, functionName: "totalSupply" },
-      { address: baseAssetAddress, abi: erc20Abi, functionName: "symbol" },
-      { address: baseAssetAddress, abi: erc20Abi, functionName: "decimals" },
+      { address: vaultAddress, abi: vaultAbi, functionName: "nav", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "navPerShare", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "highWaterMark", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps", chainId: ACTIVE_CHAIN_ID },
+      { address: shareTokenAddress, abi: erc20Abi, functionName: "symbol", chainId: ACTIVE_CHAIN_ID },
+      { address: shareTokenAddress, abi: erc20Abi, functionName: "totalSupply", chainId: ACTIVE_CHAIN_ID },
+      { address: baseAssetAddress, abi: erc20Abi, functionName: "symbol", chainId: ACTIVE_CHAIN_ID },
+      { address: baseAssetAddress, abi: erc20Abi, functionName: "decimals", chainId: ACTIVE_CHAIN_ID },
     ],
     query: { enabled: Boolean(shareTokenAddress && baseAssetAddress) },
   });
