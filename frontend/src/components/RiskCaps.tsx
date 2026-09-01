@@ -10,16 +10,22 @@ export function RiskCaps({
   maxSingleAssetBps,
   maxDrawdownBps,
   baseSymbol,
+  baseDecimals = 18,
 }: {
   maxPositionSize?: bigint;
   maxSingleAssetBps?: number;
   maxDrawdownBps?: number;
   baseSymbol?: string;
+  /** Caps are denominated in the base asset's own units, like NAV. */
+  baseDecimals?: number;
 }) {
   const rows = [
     {
       label: "Max position size",
-      value: maxPositionSize !== undefined ? `${formatCompact(maxPositionSize)} ${baseSymbol ?? ""}` : "—",
+      value:
+        maxPositionSize !== undefined
+          ? `${formatCompact(maxPositionSize, baseDecimals)} ${baseSymbol ?? ""}`
+          : "—",
       note: "per single trade",
     },
     {

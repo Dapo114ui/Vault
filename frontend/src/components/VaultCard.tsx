@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useReadContract, useReadContracts } from "wagmi";
+import { useReadContracts } from "wagmi";
 import { vaultAbi, erc20Abi } from "@/lib/abis";
 import { formatBps, formatCompact, formatToken, shortenAddress, drawdownBps } from "@/lib/format";
 import { SampleTag } from "./DemoBanner";
@@ -12,6 +12,8 @@ type CardData = {
   name?: string;
   shareSymbol?: string;
   baseSymbol?: string;
+  /** NAV is denominated in the base asset's own units, not always 18. */
+  baseDecimals?: number;
   strategy?: string;
   nav?: bigint;
   navPerShare?: bigint;
@@ -50,7 +52,9 @@ function VaultCardView({ data }: { data: CardData }) {
       </div>
 
       <div className="mt-5 flex items-baseline gap-2">
-        <span className="text-2xl font-semibold text-ink">{formatCompact(data.nav)}</span>
+        <span className="text-2xl font-semibold text-ink">
+          {formatCompact(data.nav, data.baseDecimals ?? 18)}
+        </span>
         <span className="text-sm text-ink-muted">{data.baseSymbol ?? ""} TVL</span>
       </div>
 
@@ -86,6 +90,7 @@ export function DemoVaultCard({ vault }: { vault: DemoVault }) {
         name: vault.name,
         shareSymbol: vault.shareSymbol,
         baseSymbol: vault.baseSymbol,
+        baseDecimals: 18,
         strategy: vault.strategy,
         nav: vault.nav,
         navPerShare: vault.navPerShare,
@@ -99,11 +104,17 @@ export function DemoVaultCard({ vault }: { vault: DemoVault }) {
 }
 
 export function VaultCard({ vaultAddress }: { vaultAddress: `0x${string}` }) {
-  const { data: shareTokenAddress } = useReadContract({
-    address: vaultAddress,
-    abi: vaultAbi,
-    functionName: "shareToken",
+  const { data: tokens } = useReadContracts({
+    contracts: [
+      { address: vaultAddress, abi: vaultAbi, functionName: "shareToken" },
+      { address: vaultAddress, abi: vaultAbi, functionName: "baseAsset" },
+    ],
   });
+
+  const [shareTokenAddress, baseAssetAddress] = (tokens?.map((d) => d.result) ?? []) as [
+    `0x${string}` | undefined,
+    `0x${string}` | undefined,
+  ];
 
   const { data } = useReadContracts({
     contracts: [
@@ -113,19 +124,31 @@ export function VaultCard({ vaultAddress }: { vaultAddress: `0x${string}` }) {
       { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps" },
       { address: shareTokenAddress, abi: erc20Abi, functionName: "symbol" },
       { address: shareTokenAddress, abi: erc20Abi, functionName: "totalSupply" },
+      { address: baseAssetAddress, abi: erc20Abi, functionName: "symbol" },
+      { address: baseAssetAddress, abi: erc20Abi, functionName: "decimals" },
     ],
-    query: { enabled: Boolean(shareTokenAddress) },
+    query: { enabled: Boolean(shareTokenAddress && baseAssetAddress) },
   });
 
-  const [nav, navPerShare, highWaterMark, performanceFeeBps, shareSymbol, totalSupply] =
-    (data?.map((d) => d.result) ?? []) as [
-      bigint | undefined,
-      bigint | undefined,
-      bigint | undefined,
-      bigint | undefined,
-      string | undefined,
-      bigint | undefined,
-    ];
+  const [
+    nav,
+    navPerShare,
+    highWaterMark,
+    performanceFeeBps,
+    shareSymbol,
+    totalSupply,
+    baseSymbol,
+    baseDecimals,
+  ] = (data?.map((d) => d.result) ?? []) as [
+    bigint | undefined,
+    bigint | undefined,
+    bigint | undefined,
+    bigint | undefined,
+    string | undefined,
+    bigint | undefined,
+    string | undefined,
+    number | undefined,
+  ];
 
   return (
     <VaultCardView
@@ -133,6 +156,8 @@ export function VaultCard({ vaultAddress }: { vaultAddress: `0x${string}` }) {
         address: vaultAddress,
         name: shareSymbol ? `${shareSymbol} vault` : "Vault",
         shareSymbol,
+        baseSymbol,
+        baseDecimals,
         strategy: shortenAddress(vaultAddress),
         nav,
         navPerShare,

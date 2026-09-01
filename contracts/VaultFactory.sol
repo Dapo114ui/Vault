@@ -36,6 +36,7 @@ contract VaultFactory is Ownable {
         address trader;
         address feeRecipient;
         uint256 performanceFeeBps;
+        uint256 maxOracleAge;
         RiskManager.Caps caps;
     }
 
@@ -60,7 +61,8 @@ contract VaultFactory is Ownable {
             router,
             oracle,
             p.feeRecipient,
-            p.performanceFeeBps
+            p.performanceFeeBps,
+            p.maxOracleAge
         );
         vaultAddr = address(vault);
 

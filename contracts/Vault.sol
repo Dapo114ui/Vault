@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -29,16 +30,28 @@ contract Vault is Ownable, ReentrancyGuard {
     address public strategyExecutor;
     address public feeRecipient;
     uint256 public performanceFeeBps; // e.g. 2000 = 20%
-    uint256 public highWaterMark; // NAV per share, 1e18-scaled, in baseAsset terms
+    uint256 public highWaterMark; // NAV per share, 1e18-scaled
+
+    /// @notice Decimals of `baseAsset`. NAV and withdrawals are denominated in
+    /// this asset's own units (USDT's 6, not 18), while shares are always
+    /// 18-decimal, so the two scales must be converted between explicitly.
+    uint8 public immutable baseDecimals;
 
     // Non-base assets the vault may hold after swaps, tracked so NAV can
     // price them via the oracle without scanning arbitrary balances.
     address[] public trackedAssets;
     mapping(address => bool) public isTrackedAsset;
     mapping(address => string) public oracleKeys; // asset => DIA oracle key, e.g. "X1/USD"
+    mapping(address => uint8) public assetDecimals;
+
+    /// @notice Max age of a DIA price before NAV reverts. A stale feed makes
+    /// every share price wrong, so the vault refuses to quote rather than
+    /// mint or burn against a price it cannot trust.
+    uint256 public maxOracleAge;
 
     uint256 private constant PRECISION = 1e18;
     uint256 private constant BPS_DENOMINATOR = 10_000;
+    uint256 private constant ORACLE_SCALE = 1e8; // DIA prices are 1e8-scaled USD
 
     event Deposit(address indexed user, uint256 assetsIn, uint256 sharesOut);
     event Withdraw(address indexed user, uint256 sharesIn, uint256 assetsOut);
@@ -47,12 +60,17 @@ contract Vault is Ownable, ReentrancyGuard {
     event StrategyExecutorUpdated(address indexed strategyExecutor);
     event AssetTracked(address indexed asset, string oracleKey);
 
+    event MaxOracleAgeUpdated(uint256 maxOracleAge);
+
     error OnlyStrategyExecutor();
     error ZeroAmount();
     error InsufficientShares();
     error AssetNotTracked(address asset);
     error AssetAlreadyTracked(address asset);
     error InvalidPath();
+    error UnsupportedDecimals(address token, uint8 decimals);
+    error StalePrice(address asset, uint256 updatedAt);
+    error InvalidPrice(address asset);
 
     modifier onlyStrategyExecutor() {
         if (msg.sender != strategyExecutor) revert OnlyStrategyExecutor();
@@ -67,7 +85,8 @@ contract Vault is Ownable, ReentrancyGuard {
         IEcodexRouter router_,
         IDIAOracle oracle_,
         address feeRecipient_,
-        uint256 performanceFeeBps_
+        uint256 performanceFeeBps_,
+        uint256 maxOracleAge_
     ) Ownable(owner_) {
         baseAsset = baseAsset_;
         shareToken = shareToken_;
@@ -76,7 +95,14 @@ contract Vault is Ownable, ReentrancyGuard {
         oracle = oracle_;
         feeRecipient = feeRecipient_;
         performanceFeeBps = performanceFeeBps_;
+        maxOracleAge = maxOracleAge_;
         highWaterMark = PRECISION; // starts at 1.0 baseAsset per share
+
+        uint8 d = IERC20Metadata(address(baseAsset_)).decimals();
+        // Scaling to 18-decimal share terms multiplies up, so a base asset
+        // with more than 18 decimals is out of range rather than merely lossy.
+        if (d > 18) revert UnsupportedDecimals(address(baseAsset_), d);
+        baseDecimals = d;
     }
 
     // --- admin ---
@@ -88,16 +114,27 @@ contract Vault is Ownable, ReentrancyGuard {
 
     function trackAsset(address asset, string calldata oracleKey) external onlyOwner {
         if (isTrackedAsset[asset]) revert AssetAlreadyTracked(asset);
+        uint8 d = IERC20Metadata(asset).decimals();
+        if (d > 18) revert UnsupportedDecimals(asset, d);
         isTrackedAsset[asset] = true;
         oracleKeys[asset] = oracleKey;
+        assetDecimals[asset] = d;
         trackedAssets.push(asset);
         emit AssetTracked(asset, oracleKey);
     }
 
+    function setMaxOracleAge(uint256 newMaxAge) external onlyOwner {
+        maxOracleAge = newMaxAge;
+        emit MaxOracleAgeUpdated(newMaxAge);
+    }
+
     // --- accounting ---
 
-    /// @notice Vault NAV in baseAsset terms: idle baseAsset plus the priced
-    /// value of every tracked non-base asset the vault currently holds.
+    /// @notice Vault NAV denominated in `baseAsset`'s own units: idle
+    /// baseAsset plus the priced value of every tracked non-base asset.
+    /// @dev `baseAsset` is assumed to be USD-denominated (a USD stablecoin),
+    /// since DIA quotes assets in USD and NAV is reported in base units. A
+    /// non-USD base asset would need its own feed to convert through.
     function nav() public view returns (uint256 totalNav) {
         totalNav = baseAsset.balanceOf(address(this));
         uint256 len = trackedAssets.length;
@@ -105,18 +142,36 @@ contract Vault is Ownable, ReentrancyGuard {
             address asset = trackedAssets[i];
             uint256 bal = IERC20(asset).balanceOf(address(this));
             if (bal == 0) continue;
-            (uint128 price, ) = oracle.getValue(oracleKeys[asset]);
-            // DIA prices are 1e8-scaled; this draft assumes both the priced
-            // asset and baseAsset use 18 decimals. Revisit before
-            // supporting non-18-decimal tokens (e.g. USDT's 6).
-            totalNav += (bal * price) / 1e8;
+            totalNav += _valueInBase(asset, bal);
         }
+    }
+
+    /// @notice Value of `amount` of `asset` in baseAsset units, converting
+    /// across both tokens' decimals and the oracle's 1e8 USD scale.
+    function _valueInBase(address asset, uint256 amount) internal view returns (uint256) {
+        (uint128 price, uint128 updatedAt) = oracle.getValue(oracleKeys[asset]);
+        if (price == 0) revert InvalidPrice(asset);
+        if (maxOracleAge != 0 && block.timestamp > uint256(updatedAt) + maxOracleAge) {
+            revert StalePrice(asset, updatedAt);
+        }
+        // amount is in 10**assetDecimals; price is USD * 1e8; the result must
+        // land in 10**baseDecimals.
+        return
+            (amount * uint256(price) * (10 ** baseDecimals)) /
+            (10 ** assetDecimals[asset] * ORACLE_SCALE);
+    }
+
+    /// @notice NAV restated in 18-decimal terms, which is the scale shares are
+    /// minted in. Keeps NAV/share near 1.0 regardless of the base asset's own
+    /// decimals, so the high-water mark stays comparable across vaults.
+    function _navScaled() internal view returns (uint256) {
+        return nav() * (10 ** (18 - baseDecimals));
     }
 
     function navPerShare() public view returns (uint256) {
         uint256 supply = shareToken.totalSupply();
         if (supply == 0) return PRECISION;
-        return (nav() * PRECISION) / supply;
+        return (_navScaled() * PRECISION) / supply;
     }
 
     /// @notice Mints performance-fee shares to `feeRecipient` for any profit
@@ -152,7 +207,11 @@ contract Vault is Ownable, ReentrancyGuard {
         uint256 navBefore = nav();
         baseAsset.safeTransferFrom(msg.sender, address(this), amount);
 
-        sharesOut = supply == 0 ? amount : (amount * supply) / navBefore;
+        // Seed the vault at 1.0 NAV/share in 18-decimal terms; afterwards the
+        // ratio amount/navBefore is unitless, so supply's scale carries over.
+        sharesOut = supply == 0
+            ? amount * (10 ** (18 - baseDecimals))
+            : (amount * supply) / navBefore;
         shareToken.mint(msg.sender, sharesOut);
         emit Deposit(msg.sender, amount, sharesOut);
     }
@@ -195,8 +254,7 @@ contract Vault is Ownable, ReentrancyGuard {
         uint256 navAfterTrade = nav();
         if (tokenOut != address(baseAsset)) {
             uint256 outBal = IERC20(tokenOut).balanceOf(address(this));
-            (uint128 price, ) = oracle.getValue(oracleKeys[tokenOut]);
-            uint256 exposureValue = (outBal * price) / 1e8;
+            uint256 exposureValue = _valueInBase(tokenOut, outBal);
             riskManager.checkAssetExposure(exposureValue, navAfterTrade);
         }
         riskManager.checkDrawdown(navPerShare(), highWaterMark);

@@ -36,12 +36,18 @@ module.exports = {
   },
   networks: {
     hardhat: {},
-    // X1 EcoChain testnet (Maculatus). RPC/chainId per the public docs at
-    // x1ecochain.gitbook.io — confirm against the live docs before deploying,
-    // network parameters change during testnet phases.
+    // X1 EcoChain testnet (Maculatus). These defaults come from public
+    // sources (chainlist + the Maculatus explorer at maculatus-scan.x1eco.com)
+    // and are NOT yet confirmed against a live RPC handshake — note another
+    // unrelated network also markets itself as "X1". Verify with
+    //   curl -X POST -H 'Content-Type: application/json' \
+    //     --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' <rpc>
+    // before trusting them, and override via env in the meantime.
     x1Testnet: {
-      url: process.env.X1_TESTNET_RPC_URL || "https://testnet-rpc.x1ecochain.com",
-      chainId: process.env.X1_TESTNET_CHAIN_ID ? Number(process.env.X1_TESTNET_CHAIN_ID) : undefined,
+      url: process.env.X1_TESTNET_RPC_URL || "https://maculatus-rpc.x1eco.com",
+      chainId: process.env.X1_TESTNET_CHAIN_ID
+        ? Number(process.env.X1_TESTNET_CHAIN_ID)
+        : 10778,
       accounts: DEPLOYER_KEY ? [DEPLOYER_KEY] : [],
     },
     x1Mainnet: {

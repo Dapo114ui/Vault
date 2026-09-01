@@ -47,15 +47,17 @@ export function usePortfolio() {
       { address: vault, abi: vaultAbi, functionName: "nav" as const },
       { address: vault, abi: vaultAbi, functionName: "navPerShare" as const },
       { address: vault, abi: vaultAbi, functionName: "shareToken" as const },
+      { address: vault, abi: vaultAbi, functionName: "baseDecimals" as const },
     ]),
     query: { enabled: addresses.length > 0 },
   });
 
   const perVault = addresses.map((vault, i) => ({
     vault,
-    nav: vaultState?.[i * 3]?.result as bigint | undefined,
-    navPerShare: vaultState?.[i * 3 + 1]?.result as bigint | undefined,
-    shareToken: vaultState?.[i * 3 + 2]?.result as `0x${string}` | undefined,
+    nav: vaultState?.[i * 4]?.result as bigint | undefined,
+    navPerShare: vaultState?.[i * 4 + 1]?.result as bigint | undefined,
+    shareToken: vaultState?.[i * 4 + 2]?.result as `0x${string}` | undefined,
+    baseDecimals: vaultState?.[i * 4 + 3]?.result as number | undefined,
   }));
 
   const { data: balances } = useReadContracts({
@@ -68,7 +70,14 @@ export function usePortfolio() {
     query: { enabled: Boolean(userAddress) && perVault.every((v) => Boolean(v.shareToken)) },
   });
 
-  const totalNav = perVault.reduce((sum, v) => sum + (v.nav ?? 0n), 0n);
+  // Vaults may use base assets with different decimals, so normalise each to
+  // 18 before summing -- adding raw balances across scales is meaningless.
+  // (Cross-vault totals still assume every base asset is USD-denominated,
+  // the same assumption Vault.nav() documents.)
+  const totalNav = perVault.reduce((sum, v) => {
+    if (v.nav === undefined || v.baseDecimals === undefined) return sum;
+    return sum + v.nav * 10n ** BigInt(18 - v.baseDecimals);
+  }, 0n);
 
   const positionValue = perVault.reduce((sum, v, i) => {
     const shares = balances?.[i]?.result as bigint | undefined;

@@ -164,6 +164,7 @@ export default function VaultPage() {
             maxSingleAssetBps={caps?.maxSingleAssetBps}
             maxDrawdownBps={caps?.maxDrawdownBps}
             baseSymbol={baseSymbol}
+            baseDecimals={baseDecimals ?? 18}
           />
 
           <div className="grid gap-4">

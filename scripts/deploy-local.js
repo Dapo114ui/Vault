@@ -8,8 +8,8 @@ async function main() {
   const [deployer, trader, feeRecipient, demoUser] = await ethers.getSigners();
 
   const MockERC20 = await ethers.getContractFactory("MockERC20");
-  const baseAsset = await MockERC20.deploy("Mock USDT", "mUSDT");
-  const wx1 = await MockERC20.deploy("Mock Wrapped X1", "mWX1");
+  const baseAsset = await MockERC20.deploy("Mock USDT", "mUSDT", 18);
+  const wx1 = await MockERC20.deploy("Mock Wrapped X1", "mWX1", 18);
   await baseAsset.waitForDeployment();
   await wx1.waitForDeployment();
 
@@ -37,6 +37,7 @@ async function main() {
     trader: trader.address,
     feeRecipient: feeRecipient.address,
     performanceFeeBps: 2_000,
+    maxOracleAge: 3600,
     caps: {
       maxPositionSize: ethers.parseEther("10000"),
       maxSingleAssetBps: 10_000,

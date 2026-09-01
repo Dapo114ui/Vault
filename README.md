@@ -57,17 +57,36 @@ VaultFactory
   development (against a Hardhat node, since nothing's on X1 yet) and
   Vercel deployment setup.
 
+## Deploying
+
+`scripts/deploy-x1.js` deploys the factory (and a first vault) to a real
+network. It takes every external address from the environment and deploys
+no mocks:
+
+```bash
+BASE_ASSET_ADDRESS=0x…            # required: the ERC-20 the vault accounts in
+ROUTER_ADDRESS=0x…                # optional: Ecodex router
+ORACLE_ADDRESS=0x…                # optional: DIA oracle
+npx hardhat run scripts/deploy-x1.js --network x1Testnet
+```
+
+A vault that only ever holds its base asset never calls the router or the
+oracle, so both may be omitted for a **deposit-and-withdraw-only v1** while
+Ecodex's and DIA's addresses on X1 are still unconfirmed. The script wires
+`address(0)` in that case and says so loudly, rather than pointing at a
+placeholder. It prints the three `NEXT_PUBLIC_*` values to set in Vercel;
+setting them takes the frontend out of preview mode.
+
 ## What's intentionally not here yet
 
-- Deployment scripts/addresses for X1 EcoChain testnet or mainnet — no
-  RPC endpoint or Ecodex/DIA contract addresses have been confirmed yet
-  (see `docs/RESEARCH_NOTES.md`).
-- Multi-asset decimal handling — `nav()` currently assumes both the base
-  asset and any tracked asset use 18 decimals; USDT-style 6-decimal assets
-  need explicit scaling before this is used with real tokens.
-- Oracle staleness checks — `IDIAOracle.getValue` returns a timestamp that
-  `Vault.nav()` does not yet validate against a max-age threshold.
-- Audit — flagged in the grant plan as the likely long pole against the
+- **Confirmed X1 network parameters.** `hardhat.config.js` defaults to
+  chain ID `10778` / `https://maculatus-rpc.x1eco.com` from public sources,
+  unverified against a live RPC handshake — and another unrelated network
+  also markets itself as "X1". Confirm before deploying.
+- **Ecodex router and DIA oracle addresses on X1**, and with them the real
+  router ABI — `IEcodexRouter` still assumes a Uniswap-V2 shape. Trading
+  is blocked on these; deposits and withdrawals are not.
+- **Audit** — flagged in the grant plan as the likely long pole against the
   90–120 day window; not started.
 
 ## Development

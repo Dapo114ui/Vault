@@ -112,6 +112,13 @@ export const vaultAbi = [
   },
   {
     type: "function",
+    name: "baseDecimals",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint8" }],
+  },
+  {
+    type: "function",
     name: "deposit",
     stateMutability: "nonpayable",
     inputs: [{ name: "amount", type: "uint256" }],

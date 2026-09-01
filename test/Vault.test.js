@@ -8,8 +8,8 @@ async function deployFixture() {
   const [owner, trader, feeRecipient, alice, bob] = await ethers.getSigners();
 
   const MockERC20 = await ethers.getContractFactory("MockERC20");
-  const baseAsset = await MockERC20.deploy("Mock USDT", "mUSDT");
-  const wx1 = await MockERC20.deploy("Mock Wrapped X1", "mWX1");
+  const baseAsset = await MockERC20.deploy("Mock USDT", "mUSDT", 18);
+  const wx1 = await MockERC20.deploy("Mock Wrapped X1", "mWX1", 18);
 
   const MockDIAOracle = await ethers.getContractFactory("MockDIAOracle");
   const oracle = await MockDIAOracle.deploy();
@@ -38,6 +38,7 @@ async function deployFixture() {
     trader: trader.address,
     feeRecipient: feeRecipient.address,
     performanceFeeBps: 2_000, // 20%
+    maxOracleAge: 3600,
     caps,
   });
   const receipt = await tx.wait();
@@ -197,6 +198,7 @@ describe("Vault", function () {
         trader: trader.address,
         feeRecipient: owner.address,
         performanceFeeBps: 0,
+        maxOracleAge: 3600,
         caps: {
           maxPositionSize: ethers.parseEther("10000"),
           maxSingleAssetBps: 2_000, // 20% max exposure to any single non-base asset

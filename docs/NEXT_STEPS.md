@@ -37,6 +37,34 @@ them against.
 brief as the likely long pole) now that there's a concrete, scoped codebase
 to send them rather than a description.
 
+## 2b. Deployment readiness (added after the frontend went live)
+
+**Done.** Two deployment-blocking correctness issues in the contracts are
+fixed and covered by tests:
+
+- **Decimal handling.** `nav()` assumed 18 decimals for every asset. With a
+  6-decimal base asset (as USDT actually is), it added a 6-decimal balance
+  to an 18-decimal priced value, putting NAV out by ~10¹² and mispricing
+  every deposit and withdrawal. NAV is now denominated in the base asset's
+  own units, shares are always 18-decimal, and conversions are explicit.
+  `test/Decimals.test.js` pins the exact failure case.
+- **Oracle safety.** A stale or zero DIA price now reverts NAV rather than
+  silently mispricing shares, with the max age owner-configurable. A vault
+  holding only its base asset never consults the oracle at all — which is
+  what makes a deposit-only v1 possible before DIA integration exists.
+
+Also added `scripts/deploy-x1.js` for real-network deployment.
+
+**Remaining blockers, in order:**
+
+1. Confirm X1's testnet RPC/chain ID (candidates in `hardhat.config.js`).
+2. Fund a deployer from the testnet faucet.
+3. Deploy factory + a base-asset-only vault → set the three
+   `NEXT_PUBLIC_*` vars in Vercel → the app leaves preview mode and is
+   genuinely usable.
+4. Find Ecodex's router and DIA's oracle addresses on X1, verify the real
+   router ABI, then redeploy with trading enabled.
+
 ## 3. Draft grant application once MVP scope and timeline are firm
 
 **Not started — blocked on #1's mainnet-timeline follow-up.** The
