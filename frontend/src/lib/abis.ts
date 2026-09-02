@@ -206,6 +206,58 @@ export const vaultFactoryAbi = [
   },
   {
     type: "function",
+    name: "owner",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "router",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "oracle",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    // Component order must match VaultFactory.DeployParams exactly.
+    type: "function",
+    name: "deployVault",
+    stateMutability: "nonpayable",
+    inputs: [
+      {
+        name: "p",
+        type: "tuple",
+        components: [
+          { name: "baseAsset", type: "address" },
+          { name: "shareName", type: "string" },
+          { name: "shareSymbol", type: "string" },
+          { name: "trader", type: "address" },
+          { name: "feeRecipient", type: "address" },
+          { name: "performanceFeeBps", type: "uint256" },
+          { name: "maxOracleAge", type: "uint256" },
+          {
+            name: "caps",
+            type: "tuple",
+            components: [
+              { name: "maxPositionSize", type: "uint256" },
+              { name: "maxSingleAssetBps", type: "uint256" },
+              { name: "maxDrawdownBps", type: "uint256" },
+            ],
+          },
+        ],
+      },
+    ],
+    outputs: [{ name: "vaultAddr", type: "address" }],
+  },
+  {
+    type: "function",
     name: "vaultDeployer",
     stateMutability: "view",
     inputs: [{ name: "", type: "address" }],

@@ -135,10 +135,23 @@ but does **not** own it, so they cannot widen their own risk caps or
 reassign their own trader. The caps stay a protocol guarantee rather than an
 operator preference. Verified end-to-end on a node, not just in unit tests.
 
-**Still to do here:** the vault-creation UI, and surfacing the trader and
-deployer on the vault page so "who runs this vault" is impossible to miss.
-A trader console is also still missing — `StrategyExecutor.executeSwap`
-works but nothing in the frontend calls it.
+**The interface caught up too.** `/strategies/new` deploys a vault from the
+browser: it resolves the base asset to confirm it is really an ERC-20 and to
+learn its decimals (the position cap is denominated in them), mirrors every
+one of the factory's bounds client-side so an operator sees the problem
+before paying gas, and redirects to the new vault on success. The page reads
+the factory to decide what to show — the owner and approved operators get
+the form, everyone else gets an explanation and disabled fields. Against the
+older factory now live on X1, where `isApprovedDeployer` does not exist,
+it falls back to owner-only and says the bounds are advisory rather than
+enforced.
+
+The vault page also names the trader, read from `StrategyExecutor.trader()`,
+alongside what that address can and cannot do.
+
+**Still missing:** a trader console. `StrategyExecutor.executeSwap` works but
+nothing in the frontend calls it, so once trading is switched on the
+designated trader would be hand-crafting transactions.
 
 ## 3. Remaining work
 

@@ -64,7 +64,8 @@ VaultFactory
   base/quote assets, used only by the test suite (and `scripts/deploy-local.js`,
   below).
 - **`frontend/`** — Next.js + wagmi/viem dashboard: connect a wallet, browse
-  deployed vaults, deposit/withdraw. See `frontend/README.md` for local
+  deployed vaults, deposit/withdraw, and — for the factory owner or an
+  approved operator — deploy a new strategy vault at `/strategies/new`. See `frontend/README.md` for local
   development (against a Hardhat node, since nothing's on X1 yet) and
   Vercel deployment setup.
 
