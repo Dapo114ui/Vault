@@ -75,6 +75,9 @@ contract VaultFactory is Ownable {
         address feeRecipient;
         uint256 performanceFeeBps;
         uint256 maxOracleAge;
+        /// @dev Zero means uncapped; set it here rather than after deploy so
+        /// a guarded launch has no uncapped window.
+        uint256 depositCap;
         RiskManager.Caps caps;
     }
 
@@ -136,7 +139,8 @@ contract VaultFactory is Ownable {
             oracle,
             p.feeRecipient,
             p.performanceFeeBps,
-            p.maxOracleAge
+            p.maxOracleAge,
+            p.depositCap
         );
         vaultAddr = address(vault);
 

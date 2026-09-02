@@ -42,6 +42,7 @@ async function sixDecimalFixture() {
     feeRecipient: feeRecipient.address,
     performanceFeeBps: 2_000,
     maxOracleAge: 3600,
+    depositCap: 0n, // uncapped in tests/scripts unless set explicitly
     caps: {
       maxPositionSize: usdt(100_000),
       maxSingleAssetBps: 10_000,
@@ -163,6 +164,7 @@ describe("Decimal handling", function () {
         feeRecipient: feeRecipient.address,
         performanceFeeBps: 0,
         maxOracleAge: 3600,
+        depositCap: 0n, // uncapped in tests/scripts unless set explicitly
         caps: { maxPositionSize: 1n, maxSingleAssetBps: 1, maxDrawdownBps: 1 },
       })
     ).to.be.revertedWithCustomError(await ethers.getContractFactory("Vault"), "UnsupportedDecimals");

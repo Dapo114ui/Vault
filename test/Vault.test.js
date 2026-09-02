@@ -39,6 +39,7 @@ async function deployFixture() {
     feeRecipient: feeRecipient.address,
     performanceFeeBps: 2_000, // 20%
     maxOracleAge: 3600,
+    depositCap: 0n, // uncapped in tests/scripts unless set explicitly
     caps,
   });
   const receipt = await tx.wait();
@@ -199,6 +200,7 @@ describe("Vault", function () {
         feeRecipient: owner.address,
         performanceFeeBps: 0,
         maxOracleAge: 3600,
+        depositCap: 0n, // uncapped in tests/scripts unless set explicitly
         caps: {
           maxPositionSize: ethers.parseEther("10000"),
           maxSingleAssetBps: 2_000, // 20% max exposure to any single non-base asset

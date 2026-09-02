@@ -24,6 +24,7 @@ type Form = {
   performanceFeePct: string;
   maxOracleAgeSeconds: string;
   maxPositionSize: string;
+  depositCap: string;
   maxSingleAssetPct: string;
   maxDrawdownPct: string;
 };
@@ -37,6 +38,7 @@ const EMPTY: Form = {
   performanceFeePct: "20",
   maxOracleAgeSeconds: "3600",
   maxPositionSize: "",
+  depositCap: "",
   maxSingleAssetPct: "40",
   maxDrawdownPct: "15",
 };
@@ -109,6 +111,7 @@ export default function NewStrategy() {
             feeRecipient: form.feeRecipient as `0x${string}`,
             performanceFeeBps: BigInt(Math.round(pct(form.performanceFeePct) * 100)),
             maxOracleAge: BigInt(form.maxOracleAgeSeconds || "0"),
+            depositCap: form.depositCap ? parseToken(form.depositCap, baseDecimals) : 0n,
             caps: {
               maxPositionSize: parseToken(form.maxPositionSize, baseDecimals),
               maxSingleAssetBps: BigInt(Math.round(pct(form.maxSingleAssetPct) * 100)),
@@ -247,6 +250,31 @@ export default function NewStrategy() {
               />
             </Field>
           </div>
+        </Section>
+
+        <Section
+          title="Launch guard"
+          hint="A ceiling on how much the vault will take. Raise it later, or pause the vault entirely, from the owner wallet."
+          disabled={!deploy.canDeploy}
+        >
+          <Field
+            label="Deposit cap"
+            hint={
+              baseSymbol
+                ? `total NAV ceiling in ${baseSymbol} — leave blank for uncapped`
+                : "leave blank for uncapped"
+            }
+          >
+            <input
+              value={form.depositCap}
+              onChange={set("depositCap")}
+              type="number"
+              min="0"
+              step="any"
+              placeholder="uncapped"
+              className={inputClass}
+            />
+          </Field>
         </Section>
 
         <Section
@@ -465,6 +493,11 @@ function validate(
   if (!Number.isFinite(fee) || fee < 0) out.push("Performance fee must be zero or more.");
   else if (fee > ctx.maxFeeBps / 100)
     out.push(`Performance fee cannot exceed ${ctx.maxFeeBps / 100}%.`);
+
+  if (f.depositCap) {
+    const cap = Number(f.depositCap);
+    if (!Number.isFinite(cap) || cap < 0) out.push("Deposit cap cannot be negative.");
+  }
 
   const size = Number(f.maxPositionSize);
   if (!f.maxPositionSize || !Number.isFinite(size) || size <= 0)

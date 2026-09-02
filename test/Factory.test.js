@@ -40,6 +40,7 @@ async function deployFixture() {
     feeRecipient: overrides.feeRecipient ?? feeRecipient.address,
     performanceFeeBps: overrides.performanceFeeBps ?? 2_000,
     maxOracleAge: 3600,
+    depositCap: overrides.depositCap ?? 0n,
     caps: { ...VALID_CAPS, ...(overrides.caps ?? {}) },
   });
 

@@ -38,6 +38,7 @@ async function main() {
     feeRecipient: feeRecipient.address,
     performanceFeeBps: 2_000,
     maxOracleAge: 3600,
+    depositCap: 0n, // uncapped in tests/scripts unless set explicitly
     caps: {
       maxPositionSize: ethers.parseEther("10000"),
       maxSingleAssetBps: 10_000,

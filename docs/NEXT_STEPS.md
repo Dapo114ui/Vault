@@ -180,6 +180,36 @@ why), and one that quotes zero out (no route or no liquidity — a swap would
 return nothing). A vault deployed with no router says trading is impossible
 by construction instead of offering a form that cannot work.
 
+## 2g. Pause and deposit cap
+
+**Done in code, pending the same redeploy.** Two operational guards a guarded
+launch needs.
+
+**The deposit cap** is a ceiling on NAV, checked against what the vault would
+hold once the deposit lands. Zero means uncapped, matching how `maxOracleAge`
+already treats zero. It is set in `DeployParams` rather than only by a setter,
+so a guarded launch has no uncapped window between deployment and the first
+configuration transaction. `scripts/deploy-x1.js` reads `DEPOSIT_CAP` in whole
+base-asset units.
+
+**The pause** halts deposits and strategy trading. It deliberately does
+**not** halt withdrawals. A pause that stranded depositors would contradict
+the reason the vault holds its own funds in the first place — the protocol's
+central claim is that nobody can stop you leaving, and an emergency switch
+that broke that claim would be worse than no switch at all. Tested
+explicitly: a depositor withdraws in full while the vault is paused.
+
+The interface reflects both. A paused vault says so above everything else and
+states that withdrawals are unaffected; the deposit button reads "Paused" and
+is disabled. A capped vault shows the room left below the cap, and an amount
+that would exceed it disables the button as "Over cap". The creation form
+takes a cap at deploy time.
+
+One compatibility note: the vault already live on X1 predates both functions,
+so those two reads fail against it. The vault page passes `allowFailure`
+explicitly so the rest of the page still renders — verified against an
+address that is not a vault at all, which is the worst case.
+
 ## 3. Remaining work
 
 **Blocker:** find Ecodex's router and DIA's oracle addresses on X1,

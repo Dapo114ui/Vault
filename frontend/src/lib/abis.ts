@@ -126,6 +126,20 @@ export const vaultAbi = [
   },
   {
     type: "function",
+    name: "paused",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "depositCap",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
     name: "trackedAssets",
     stateMutability: "view",
     inputs: [{ name: "", type: "uint256" }],
@@ -282,6 +296,7 @@ export const vaultFactoryAbi = [
           { name: "feeRecipient", type: "address" },
           { name: "performanceFeeBps", type: "uint256" },
           { name: "maxOracleAge", type: "uint256" },
+          { name: "depositCap", type: "uint256" },
           {
             name: "caps",
             type: "tuple",

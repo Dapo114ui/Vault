@@ -14,11 +14,18 @@ export function DepositForm({
   baseAssetAddress,
   baseAssetDecimals,
   baseAssetSymbol,
+  isPaused = false,
+  depositCap,
+  nav,
 }: {
   vaultAddress: `0x${string}`;
   baseAssetAddress: `0x${string}`;
   baseAssetDecimals: number;
   baseAssetSymbol: string;
+  isPaused?: boolean;
+  /** Zero means uncapped, matching the contract. */
+  depositCap?: bigint;
+  nav?: bigint;
 }) {
   const { address: userAddress } = useAccount();
   const { isWrongNetwork } = useWrongNetwork();
@@ -49,6 +56,11 @@ export function DepositForm({
   const amountBig = amount ? parseToken(amount, baseAssetDecimals) : 0n;
   const needsApproval = amountBig > 0n && (allowance ?? 0n) < amountBig;
   const isBusy = status === "approving" || status === "depositing";
+
+  const capped = depositCap !== undefined && depositCap > 0n;
+  const room = capped && nav !== undefined ? (depositCap > nav ? depositCap - nav : 0n) : undefined;
+  const overCap = room !== undefined && amountBig > room;
+  const blocked = isPaused || (room !== undefined && room === 0n);
 
   async function handleSubmit() {
     if (!userAddress || amountBig <= 0n) return;
@@ -92,7 +104,18 @@ export function DepositForm({
           {formatToken(balance, baseAssetDecimals)} {baseAssetSymbol}
         </span>
       </div>
-      <p className="mt-1 text-xs text-ink-muted">Mints shares pro-rata to current NAV.</p>
+      <p className="mt-1 text-xs text-ink-muted">
+        {isPaused
+          ? "Paused by the vault owner. Withdrawals still work."
+          : room !== undefined && room === 0n
+            ? "The vault has reached its deposit cap."
+            : "Mints shares pro-rata to current NAV."}
+      </p>
+      {room !== undefined && room > 0n && (
+        <p className="mt-1 text-xs text-ink-muted">
+          Room below the cap: {formatToken(room, baseAssetDecimals)} {baseAssetSymbol}
+        </p>
+      )}
       <div className="mt-3 flex gap-2">
         <input
           type="number"
@@ -106,12 +129,18 @@ export function DepositForm({
         />
         <button
           onClick={handleSubmit}
-          disabled={!userAddress || isWrongNetwork || amountBig <= 0n || isBusy}
+          disabled={!userAddress || isWrongNetwork || blocked || overCap || amountBig <= 0n || isBusy}
           className="whitespace-nowrap rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40"
         >
-          {isWrongNetwork
-            ? "Wrong network"
-            : status === "approving"
+          {isPaused
+            ? "Paused"
+            : blocked
+              ? "Cap reached"
+              : overCap
+                ? "Over cap"
+                : isWrongNetwork
+                  ? "Wrong network"
+                  : status === "approving"
               ? "Approving…"
               : status === "depositing"
                 ? "Depositing…"

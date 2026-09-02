@@ -21,7 +21,11 @@ export default function VaultPage() {
   const vaultAddress = params.address as `0x${string}`;
   const demo = IS_DEMO ? getDemoVault(vaultAddress) : undefined;
 
+  // Explicit, because the vault already deployed on X1 predates `paused` and
+  // `depositCap`: those two reads fail against it, and the rest of the page
+  // must still render rather than the whole multicall throwing.
   const { data: core } = useReadContracts({
+    allowFailure: true,
     contracts: [
       { address: vaultAddress, abi: vaultAbi, functionName: "baseAsset", chainId: ACTIVE_CHAIN_ID },
       { address: vaultAddress, abi: vaultAbi, functionName: "shareToken", chainId: ACTIVE_CHAIN_ID },
@@ -32,6 +36,8 @@ export default function VaultPage() {
       { address: vaultAddress, abi: vaultAbi, functionName: "riskManager", chainId: ACTIVE_CHAIN_ID },
       { address: vaultAddress, abi: vaultAbi, functionName: "strategyExecutor", chainId: ACTIVE_CHAIN_ID },
       { address: vaultAddress, abi: vaultAbi, functionName: "feeRecipient", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "paused", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "depositCap", chainId: ACTIVE_CHAIN_ID },
     ],
     query: { enabled: !IS_DEMO },
   });
@@ -46,6 +52,8 @@ export default function VaultPage() {
     riskManagerAddress,
     strategyExecutorAddress,
     feeRecipient,
+    isPaused,
+    depositCap,
   ] = (core?.map((d) => d.result) ?? []) as [
     `0x${string}` | undefined,
     `0x${string}` | undefined,
@@ -56,6 +64,8 @@ export default function VaultPage() {
     `0x${string}` | undefined,
     `0x${string}` | undefined,
     `0x${string}` | undefined,
+    boolean | undefined,
+    bigint | undefined,
   ];
 
   const { data: tokenInfo } = useReadContracts({
@@ -173,6 +183,18 @@ export default function VaultPage() {
             </Link>
           )}
 
+        {isPaused && (
+          <div className="mt-4 flex flex-wrap items-start gap-2.5 rounded-xl border border-warning/40 bg-warning/10 p-4">
+            <span aria-hidden className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning" />
+            <p className="max-w-prose text-sm text-ink-secondary">
+              <span className="font-medium text-ink">Paused.</span> The owner has halted deposits
+              and strategy trading on this vault.{" "}
+              <span className="font-medium text-ink">Withdrawals are unaffected</span> — a pause
+              never traps funds already deposited.
+            </p>
+          </div>
+        )}
+
         <section className="mt-8">
           <HeroFigure
             label="Net asset value"
@@ -221,6 +243,9 @@ export default function VaultPage() {
                   baseAssetAddress={baseAssetAddress}
                   baseAssetDecimals={baseDecimals}
                   baseAssetSymbol={baseSymbol ?? ""}
+                  isPaused={Boolean(isPaused)}
+                  depositCap={depositCap}
+                  nav={nav}
                 />
                 <WithdrawForm
                   vaultAddress={vaultAddress}

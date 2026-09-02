@@ -37,6 +37,7 @@ async function main() {
     feeRecipient: feeRecipient.address,
     performanceFeeBps: 2_000,
     maxOracleAge: 3600,
+    depositCap: 0n, // uncapped in tests/scripts unless set explicitly
     caps: {
       maxPositionSize: 25_000n * 10n ** 6n,
       maxSingleAssetBps: 4_000,

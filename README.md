@@ -35,6 +35,9 @@ VaultFactory
   any tracked non-base asset via DIA Oracle feeds. `crystallizePerformanceFee()`
   mints fee shares to `feeRecipient` only for NAV/share above the prior
   high-water mark, so a drawdown recovery is never double-charged.
+  A `depositCap` (zero means uncapped) bounds total NAV, and `pause()` halts
+  deposits and trading — but never withdrawals, so an emergency switch can
+  never strand a depositor.
 - **`contracts/ShareToken.sol`** — plain ERC-20, mint/burn restricted to
   its Vault.
 - **`contracts/RiskManager.sol`** — `Caps { maxPositionSize,

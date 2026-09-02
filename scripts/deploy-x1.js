@@ -58,6 +58,9 @@ async function main() {
     : deployer.address;
   const performanceFeeBps = BigInt(process.env.PERFORMANCE_FEE_BPS ?? 2000);
   const maxOracleAge = BigInt(process.env.MAX_ORACLE_AGE ?? 3600);
+  // A guarded launch wants a ceiling from the first block, not one set a
+  // transaction later. Expressed in whole base-asset units; 0 is uncapped.
+  const depositCapUnits = BigInt(process.env.DEPOSIT_CAP ?? 0);
 
   // Confirm the base asset really is an ERC-20 before committing gas, and read
   // its decimals so the caps below are expressed in its own units.
@@ -94,6 +97,7 @@ async function main() {
     feeRecipient,
     performanceFeeBps,
     maxOracleAge,
+    depositCap: depositCapUnits * unit,
     caps: {
       maxPositionSize: 25_000n * unit,
       maxSingleAssetBps: 4_000, // 40% of NAV in any one non-base asset

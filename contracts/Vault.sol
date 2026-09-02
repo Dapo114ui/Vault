@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "./ShareToken.sol";
@@ -18,7 +19,7 @@ import "./interfaces/IDIAOracle.sol";
 /// Ecodex, and profit above the vault's all-time-high NAV/share is charged
 /// a performance fee at crystallization. One instance per strategy,
 /// deployed by VaultFactory.
-contract Vault is Ownable, ReentrancyGuard {
+contract Vault is Ownable, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable baseAsset;
@@ -49,6 +50,11 @@ contract Vault is Ownable, ReentrancyGuard {
     /// mint or burn against a price it cannot trust.
     uint256 public maxOracleAge;
 
+    /// @notice Ceiling on the vault's NAV. Zero means no ceiling, matching
+    /// how maxOracleAge treats zero. Used to guard a launch while the
+    /// protocol is unaudited.
+    uint256 public depositCap;
+
     uint256 private constant PRECISION = 1e18;
     uint256 private constant BPS_DENOMINATOR = 10_000;
     uint256 private constant ORACLE_SCALE = 1e8; // DIA prices are 1e8-scaled USD
@@ -61,6 +67,7 @@ contract Vault is Ownable, ReentrancyGuard {
     event AssetTracked(address indexed asset, string oracleKey);
 
     event MaxOracleAgeUpdated(uint256 maxOracleAge);
+    event DepositCapUpdated(uint256 depositCap);
 
     error OnlyStrategyExecutor();
     error ZeroAmount();
@@ -71,6 +78,7 @@ contract Vault is Ownable, ReentrancyGuard {
     error UnsupportedDecimals(address token, uint8 decimals);
     error StalePrice(address asset, uint256 updatedAt);
     error InvalidPrice(address asset);
+    error DepositCapExceeded(uint256 attemptedNav, uint256 cap);
 
     modifier onlyStrategyExecutor() {
         if (msg.sender != strategyExecutor) revert OnlyStrategyExecutor();
@@ -86,7 +94,8 @@ contract Vault is Ownable, ReentrancyGuard {
         IDIAOracle oracle_,
         address feeRecipient_,
         uint256 performanceFeeBps_,
-        uint256 maxOracleAge_
+        uint256 maxOracleAge_,
+        uint256 depositCap_
     ) Ownable(owner_) {
         baseAsset = baseAsset_;
         shareToken = shareToken_;
@@ -96,6 +105,7 @@ contract Vault is Ownable, ReentrancyGuard {
         feeRecipient = feeRecipient_;
         performanceFeeBps = performanceFeeBps_;
         maxOracleAge = maxOracleAge_;
+        depositCap = depositCap_;
         highWaterMark = PRECISION; // starts at 1.0 baseAsset per share
 
         uint8 d = IERC20Metadata(address(baseAsset_)).decimals();
@@ -121,6 +131,22 @@ contract Vault is Ownable, ReentrancyGuard {
         assetDecimals[asset] = d;
         trackedAssets.push(asset);
         emit AssetTracked(asset, oracleKey);
+    }
+
+    function setDepositCap(uint256 newCap) external onlyOwner {
+        depositCap = newCap;
+        emit DepositCapUpdated(newCap);
+    }
+
+    /// @notice Halt deposits and trading. Withdrawals are deliberately left
+    /// open: a pause that stranded depositors would contradict the whole
+    /// point of the vault holding its own funds.
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     function setMaxOracleAge(uint256 newMaxAge) external onlyOwner {
@@ -199,12 +225,17 @@ contract Vault is Ownable, ReentrancyGuard {
 
     // --- deposits / withdrawals ---
 
-    function deposit(uint256 amount) external nonReentrant returns (uint256 sharesOut) {
+    function deposit(uint256 amount) external nonReentrant whenNotPaused returns (uint256 sharesOut) {
         if (amount == 0) revert ZeroAmount();
         crystallizePerformanceFee();
 
         uint256 supply = shareToken.totalSupply();
         uint256 navBefore = nav();
+        // navBefore is measured before the transfer, so this is the NAV the
+        // vault would hold once the deposit lands.
+        if (depositCap != 0 && navBefore + amount > depositCap) {
+            revert DepositCapExceeded(navBefore + amount, depositCap);
+        }
         baseAsset.safeTransferFrom(msg.sender, address(this), amount);
 
         // Seed the vault at 1.0 NAV/share in 18-decimal terms; afterwards the
@@ -239,7 +270,7 @@ contract Vault is Ownable, ReentrancyGuard {
         uint256 amountIn,
         uint256 amountOutMin,
         uint256 deadline
-    ) external onlyStrategyExecutor nonReentrant returns (uint256[] memory amounts) {
+    ) external onlyStrategyExecutor nonReentrant whenNotPaused returns (uint256[] memory amounts) {
         if (path.length < 2) revert InvalidPath();
         address tokenOut = path[path.length - 1];
         if (tokenOut != address(baseAsset) && !isTrackedAsset[tokenOut]) {
