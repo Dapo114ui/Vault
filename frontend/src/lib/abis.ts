@@ -119,6 +119,20 @@ export const vaultAbi = [
   },
   {
     type: "function",
+    name: "router",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "trackedAssets",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "uint256" }],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
     name: "feeRecipient",
     stateMutability: "view",
     inputs: [],
@@ -172,6 +186,32 @@ export const strategyExecutorAbi = [
     stateMutability: "view",
     inputs: [],
     outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "executeSwap",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "path", type: "address[]" },
+      { name: "amountIn", type: "uint256" },
+      { name: "amountOutMin", type: "uint256" },
+      { name: "deadline", type: "uint256" },
+    ],
+    outputs: [{ name: "amounts", type: "uint256[]" }],
+  },
+] as const;
+
+/** Assumed Uniswap-V2 shape; unverified against Ecodex's deployed router. */
+export const routerAbi = [
+  {
+    type: "function",
+    name: "getAmountsOut",
+    stateMutability: "view",
+    inputs: [
+      { name: "amountIn", type: "uint256" },
+      { name: "path", type: "address[]" },
+    ],
+    outputs: [{ name: "amounts", type: "uint256[]" }],
   },
 ] as const;
 

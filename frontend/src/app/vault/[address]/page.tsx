@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useReadContract, useReadContracts } from "wagmi";
+import { useAccount, useReadContract, useReadContracts } from "wagmi";
 import { DemoBanner, SampleTag } from "@/components/DemoBanner";
 import { DepositForm } from "@/components/DepositForm";
 import { WithdrawForm } from "@/components/WithdrawForm";
@@ -16,6 +16,7 @@ import { getDemoVault, IS_DEMO } from "@/lib/demo";
 import { drawdownBps, formatBps, formatCompact, formatToken, shortenAddress } from "@/lib/format";
 
 export default function VaultPage() {
+  const { address: connected } = useAccount();
   const params = useParams<{ address: string }>();
   const vaultAddress = params.address as `0x${string}`;
   const demo = IS_DEMO ? getDemoVault(vaultAddress) : undefined;
@@ -159,6 +160,18 @@ export default function VaultPage() {
           </code>
         </div>
         {demo && <p className="mt-1 text-sm text-ink-muted">{demo.strategy}</p>}
+
+        {!IS_DEMO &&
+          connected &&
+          trader &&
+          connected.toLowerCase() === (trader as string).toLowerCase() && (
+            <Link
+              href={`/vault/${vaultAddress}/trade`}
+              className="mt-4 inline-block rounded-lg border border-border-strong px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+            >
+              Open trader console
+            </Link>
+          )}
 
         <section className="mt-8">
           <HeroFigure

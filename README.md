@@ -65,7 +65,10 @@ VaultFactory
   below).
 - **`frontend/`** — Next.js + wagmi/viem dashboard: connect a wallet, browse
   deployed vaults, deposit/withdraw, and — for the factory owner or an
-  approved operator — deploy a new strategy vault at `/strategies/new`. See `frontend/README.md` for local
+  approved operator — deploy a new strategy vault at `/strategies/new`. A
+  vault's designated trader gets a console at `/vault/<address>/trade` that
+  simulates each swap against the deployed contracts, so a trade that would
+  breach a risk cap is refused before any gas is spent. See `frontend/README.md` for local
   development (against a Hardhat node, since nothing's on X1 yet) and
   Vercel deployment setup.
 

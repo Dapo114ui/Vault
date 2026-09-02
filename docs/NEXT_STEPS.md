@@ -149,9 +149,36 @@ enforced.
 The vault page also names the trader, read from `StrategyExecutor.trader()`,
 alongside what that address can and cannot do.
 
-**Still missing:** a trader console. `StrategyExecutor.executeSwap` works but
-nothing in the frontend calls it, so once trading is switched on the
-designated trader would be hand-crafting transactions.
+## 2f. Trader console
+
+**Done.** `/vault/<address>/trade` lets a vault's designated trader route a
+swap, reachable from the vault page by that wallet only.
+
+The design decision worth recording: rather than reimplementing the risk
+checks in JavaScript to warn before submitting, the form **simulates the real
+call** (`eth_call` against the deployed executor) and reports what the
+contract says. Duplicating NAV, oracle and decimal maths in the frontend is
+precisely the code path that produced the decimals bug in 2b, and any copy
+would drift from the contract over time. Simulation cannot drift.
+
+That distinction is not academic. In testing, a 9,000-unit swap sat well
+under the position cap and well under the vault's balance — every check the
+frontend could make itself passed — and the simulation still rejected it with
+`DrawdownExceeded(3250, 1000)`, because the resulting NAV would have breached
+the 10% drawdown cap. No local check could have known that without pricing
+the position.
+
+Cheap local checks still run first, for fast feedback: unusable pair, zero
+amount, more than the vault holds, above the position cap. A quote comes from
+the router's `getAmountsOut` and sets the minimum received from a slippage
+tolerance.
+
+Two router conditions are handled explicitly rather than as errors, because
+`IEcodexRouter`'s shape is still unverified against Ecodex: a router that
+does not answer at all (the trader sets the floor by hand, and the page says
+why), and one that quotes zero out (no route or no liquidity — a swap would
+return nothing). A vault deployed with no router says trading is impossible
+by construction instead of offering a form that cannot work.
 
 ## 3. Remaining work
 
