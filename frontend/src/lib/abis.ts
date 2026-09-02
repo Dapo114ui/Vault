@@ -119,6 +119,20 @@ export const vaultAbi = [
   },
   {
     type: "function",
+    name: "feeRecipient",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "crystallizePerformanceFee",
+    stateMutability: "nonpayable",
+    inputs: [],
+    outputs: [],
+  },
+  {
+    type: "function",
     name: "deposit",
     stateMutability: "nonpayable",
     inputs: [{ name: "amount", type: "uint256" }],

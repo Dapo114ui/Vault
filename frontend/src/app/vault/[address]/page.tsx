@@ -6,7 +6,9 @@ import { useReadContract, useReadContracts } from "wagmi";
 import { DemoBanner, SampleTag } from "@/components/DemoBanner";
 import { DepositForm } from "@/components/DepositForm";
 import { WithdrawForm } from "@/components/WithdrawForm";
+import { ExplorerLink } from "@/components/ExplorerLink";
 import { RiskCaps } from "@/components/RiskCaps";
+import { VaultContracts } from "@/components/VaultContracts";
 import { HeroFigure, StatTile } from "@/components/StatTile";
 import { erc20Abi, riskManagerAbi, vaultAbi } from "@/lib/abis";
 import { ACTIVE_CHAIN_ID } from "@/lib/config";
@@ -27,6 +29,8 @@ export default function VaultPage() {
       { address: vaultAddress, abi: vaultAbi, functionName: "highWaterMark", chainId: ACTIVE_CHAIN_ID },
       { address: vaultAddress, abi: vaultAbi, functionName: "performanceFeeBps", chainId: ACTIVE_CHAIN_ID },
       { address: vaultAddress, abi: vaultAbi, functionName: "riskManager", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "strategyExecutor", chainId: ACTIVE_CHAIN_ID },
+      { address: vaultAddress, abi: vaultAbi, functionName: "feeRecipient", chainId: ACTIVE_CHAIN_ID },
     ],
     query: { enabled: !IS_DEMO },
   });
@@ -39,6 +43,8 @@ export default function VaultPage() {
     onChainHwm,
     onChainFeeBps,
     riskManagerAddress,
+    strategyExecutorAddress,
+    feeRecipient,
   ] = (core?.map((d) => d.result) ?? []) as [
     `0x${string}` | undefined,
     `0x${string}` | undefined,
@@ -46,6 +52,8 @@ export default function VaultPage() {
     bigint | undefined,
     bigint | undefined,
     bigint | undefined,
+    `0x${string}` | undefined,
+    `0x${string}` | undefined,
     `0x${string}` | undefined,
   ];
 
@@ -134,7 +142,11 @@ export default function VaultPage() {
           </h1>
           {demo && <SampleTag />}
           <code className="rounded-md bg-surface-2 px-2 py-1 font-mono text-xs text-ink-muted">
-            {shortenAddress(vaultAddress)}
+            {demo ? (
+              shortenAddress(vaultAddress)
+            ) : (
+              <ExplorerLink kind="address" value={vaultAddress} />
+            )}
           </code>
         </div>
         {demo && <p className="mt-1 text-sm text-ink-muted">{demo.strategy}</p>}
@@ -200,6 +212,20 @@ export default function VaultPage() {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="mt-4">
+          <VaultContracts
+            vaultAddress={vaultAddress}
+            shareTokenAddress={shareTokenAddress}
+            baseAssetAddress={baseAssetAddress}
+            riskManagerAddress={riskManagerAddress}
+            strategyExecutorAddress={strategyExecutorAddress}
+            feeRecipient={feeRecipient}
+            feeBps={feeBps}
+            shareSymbol={shareSymbol}
+            isDemo={Boolean(demo)}
+          />
         </div>
       </div>
     </>

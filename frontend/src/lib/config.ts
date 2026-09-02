@@ -45,6 +45,21 @@ export const wagmiConfig = createConfig({
   },
 });
 
+/**
+ * Link into the active chain's block explorer, or `undefined` when it has
+ * none -- the local Hardhat chain doesn't, so callers render plain text
+ * rather than a dead link.
+ */
+export function explorerUrl(
+  kind: "address" | "tx" | "block",
+  value: string | number | bigint,
+): string | undefined {
+  const base = (ACTIVE_CHAIN as { blockExplorers?: { default?: { url?: string } } })
+    .blockExplorers?.default?.url;
+  if (!base) return undefined;
+  return `${base.replace(/\/$/, "")}/${kind}/${value}`;
+}
+
 export const VAULT_FACTORY_ADDRESS = process.env.NEXT_PUBLIC_VAULT_FACTORY_ADDRESS as
   | `0x${string}`
   | undefined;

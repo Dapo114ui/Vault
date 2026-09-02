@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConnectButton } from "./ConnectButton";
+import { MobileNav } from "./MobileNav";
 import { NetworkBanner } from "./NetworkBanner";
 import { Sidebar } from "./Sidebar";
 
@@ -21,15 +22,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-border-subtle px-6 py-3.5">
-          <nav className="flex items-center gap-1.5 text-sm">
-            <Link href="/" className="text-ink-muted hover:text-ink">
+        <header className="relative flex items-center justify-between gap-3 border-b border-border-subtle px-4 py-3.5 sm:px-6">
+          <MobileNav />
+          <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-sm">
+            <Link href="/" className="shrink-0 text-ink-muted hover:text-ink">
               Vault
             </Link>
             {crumb && (
               <>
                 <span className="text-ink-muted">/</span>
-                <span className="text-ink">{crumb}</span>
+                <span className="truncate text-ink">{crumb}</span>
               </>
             )}
           </nav>
@@ -38,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <NetworkBanner />
 
-        <main className="flex-1 px-6 py-8">
+        <main className="flex-1 px-4 py-8 sm:px-6">
           <div className="mx-auto w-full max-w-4xl">{children}</div>
         </main>
       </div>

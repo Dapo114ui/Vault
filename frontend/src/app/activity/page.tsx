@@ -4,11 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { usePublicClient, useReadContracts } from "wagmi";
 import { parseAbiItem, formatUnits } from "viem";
 import { DemoBanner, SampleTag } from "@/components/DemoBanner";
+import { ExplorerLink } from "@/components/ExplorerLink";
 import { vaultAbi } from "@/lib/abis";
 import { ACTIVE_CHAIN_ID } from "@/lib/config";
 import { useVaultAddresses } from "@/hooks/useVaults";
 import { DEMO_ACTIVITY, IS_DEMO } from "@/lib/demo";
-import { shortenAddress } from "@/lib/format";
 
 const EVENTS = [
   parseAbiItem("event Deposit(address indexed user, uint256 assetsIn, uint256 sharesOut)"),
@@ -116,11 +116,27 @@ export default function Activity() {
               <Row
                 key={`${log.transactionHash}-${i}`}
                 kind={name}
-                vault={shortenAddress(log.address)}
+                vault={<ExplorerLink kind="address" value={log.address} />}
                 detail={detail}
-                meta={`block ${log.blockNumber?.toString() ?? "—"}${
-                  args.user ? ` · ${shortenAddress(args.user as string)}` : " · strategy"
-                }`}
+                meta={
+                  <>
+                    {log.transactionHash ? (
+                      <ExplorerLink
+                        kind="tx"
+                        value={log.transactionHash}
+                        label={`block ${log.blockNumber?.toString() ?? "—"}`}
+                      />
+                    ) : (
+                      `block ${log.blockNumber?.toString() ?? "—"}`
+                    )}
+                    {" · "}
+                    {args.user ? (
+                      <ExplorerLink kind="address" value={args.user as string} />
+                    ) : (
+                      "strategy"
+                    )}
+                  </>
+                }
               />
             );
           })
@@ -144,9 +160,9 @@ function Row({
   sample,
 }: {
   kind: string;
-  vault: string;
+  vault: React.ReactNode;
   detail: string;
-  meta: string;
+  meta: React.ReactNode;
   sample?: boolean;
 }) {
   return (
@@ -160,7 +176,7 @@ function Row({
         </div>
         <p className="tabular mt-0.5 truncate text-xs text-ink-muted">{detail}</p>
       </div>
-      <span className="shrink-0 text-xs text-ink-muted">{meta}</span>
+      <span className="shrink-0 text-right text-xs text-ink-muted">{meta}</span>
     </div>
   );
 }
