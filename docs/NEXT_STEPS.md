@@ -97,6 +97,49 @@ in the base asset's own units.
 real testnet funds through a path that hasn't been proven on this network.
 Worth doing before the vault holds anything anyone cares about.
 
+## 2e. Who can create a vault, and with what parameters
+
+**Done in code, pending a redeploy.** The factory premise is that each
+strategy is an isolated vault, but `deployVault` was `onlyOwner` with no
+interface, so in practice a vault required the owner to run a script. That
+caps the on-chain activity the grant is evaluated on at whatever one person
+can deploy by hand.
+
+Fully permissionless was rejected for now, for two reasons found by reading
+the code rather than assumed:
+
+- `deployVault` validated **nothing** — a 100% performance fee, a zero
+  position cap that bricks trading, or a zero trader address all deployed
+  happily. On an open factory that means anyone could publish a
+  confiscatory vault into the same interface as reviewed ones.
+- Every vault is owned by `owner()`, not the caller. Opening the factory
+  as-is would have made the protocol owner the governance authority for
+  strangers' vaults — liability without any control of the strategy.
+
+So: an owner-curated allowlist, with permissionless deferred until after the
+audit (it needs a per-vault ownership redesign, which is a bigger change than
+removing a modifier). What shipped:
+
+- `setDeployer` / `isApprovedDeployer`, with the owner always permitted.
+  Revoking is forward-looking: vaults already deployed keep working, so a
+  policy change never strands depositors.
+- Bounds on every deploy parameter — fee ceiling of 30%, basis-point caps
+  capped at 100%, non-zero position cap, non-zero trader/fee-recipient/base
+  asset. A non-token base asset was already rejected by `Vault`'s
+  constructor reading `decimals()` off it.
+- `vaultDeployer` plus a `deployer` field on `VaultDeployed`, so the
+  interface can name the operator behind a strategy.
+
+The deliberate part worth keeping: an approved operator trades their vault
+but does **not** own it, so they cannot widen their own risk caps or
+reassign their own trader. The caps stay a protocol guarantee rather than an
+operator preference. Verified end-to-end on a node, not just in unit tests.
+
+**Still to do here:** the vault-creation UI, and surfacing the trader and
+deployer on the vault page so "who runs this vault" is impossible to miss.
+A trader console is also still missing — `StrategyExecutor.executeSwap`
+works but nothing in the frontend calls it.
+
 ## 3. Remaining work
 
 **Blocker:** find Ecodex's router and DIA's oracle addresses on X1,

@@ -45,7 +45,17 @@ VaultFactory
   trader can call; forwards to `Vault.executeSwap`.
 - **`contracts/VaultFactory.sol`** — deploys a `ShareToken` + `RiskManager`
   + `Vault` + `StrategyExecutor` as one unit per strategy, so each vault's
-  risk caps and trader are isolated from every other vault.
+  risk caps and trader are isolated from every other vault. Deployment is
+  gated to the owner plus an owner-curated allowlist
+  (`setDeployer`/`isApprovedDeployer`), and every parameter is bounded:
+  the performance fee cannot exceed `MAX_PERFORMANCE_FEE_BPS` (30%), the
+  basis-point caps cannot exceed 100%, a zero position cap (which would
+  revert every trade) is rejected, and the trader, fee recipient and base
+  asset cannot be the zero address. Approved operators deploy vaults they
+  trade, but the factory owner owns the resulting Vault, RiskManager and
+  StrategyExecutor — so **an operator cannot widen their own risk caps or
+  reassign their own trader**. `vaultDeployer` records who deployed each
+  vault.
 - **`contracts/interfaces/`** — `IEcodexRouter` (assumed Uniswap-V2-style
   router surface — **unverified against Ecodex's actual deployed ABI**,
   see research notes), `IDIAOracle` (DIA's standard `getValue(key)`

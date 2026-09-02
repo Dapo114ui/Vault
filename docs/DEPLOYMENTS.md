@@ -33,6 +33,14 @@ USDT uses on Ethereum. Nothing in the app assumes either — `Vault` records the
 base asset's own decimals at construction and the frontend reads them back
 per vault — but it is worth knowing when eyeballing raw values in the explorer.
 
+## Redeploy pending
+
+The factory listed above predates the deployer allowlist and the
+`deployVault` parameter bounds, so on the live deployment vault creation is
+still owner-only and unvalidated. Both land with the next deployment — which
+is the same one that switches trading on, so there is no reason to spend a
+redeploy on them alone.
+
 ## Frontend
 
 The Vercel deployment needs three variables, which are what

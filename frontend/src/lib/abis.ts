@@ -195,6 +195,27 @@ export const vaultFactoryAbi = [
     outputs: [{ name: "", type: "address" }],
   },
   {
+    type: "function",
+    name: "vaultDeployer",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "isApprovedDeployer",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "MAX_PERFORMANCE_FEE_BPS",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
     type: "event",
     name: "VaultDeployed",
     inputs: [
@@ -203,6 +224,7 @@ export const vaultFactoryAbi = [
       { name: "strategyExecutor", type: "address", indexed: true },
       { name: "riskManager", type: "address", indexed: false },
       { name: "trader", type: "address", indexed: false },
+      { name: "deployer", type: "address", indexed: false },
     ],
   },
 ] as const;

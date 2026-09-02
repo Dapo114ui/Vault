@@ -16,18 +16,56 @@ import "./interfaces/IDIAOracle.sol";
 /// independently risk-capped vault instance sharing one Ecodex router and
 /// DIA oracle.
 contract VaultFactory is Ownable {
+    /// @notice Ceiling on a vault's performance fee. 20% is the conventional
+    /// rate; this leaves room above it while making a confiscatory fee
+    /// impossible to deploy, which matters once deployment is delegated to
+    /// approved operators rather than the owner alone.
+    uint256 public constant MAX_PERFORMANCE_FEE_BPS = 3_000;
+
+    uint256 private constant BPS_DENOMINATOR = 10_000;
+
     IEcodexRouter public immutable router;
     IDIAOracle public immutable oracle;
 
     address[] public vaults;
+
+    /// @notice Who deployed each vault. The factory owner still owns every
+    /// vault (see `deployVault`), so this records the operator behind a
+    /// strategy, which is not the same address.
+    mapping(address => address) public vaultDeployer;
+
+    /// @notice Addresses permitted to deploy vaults besides the owner.
+    /// Curated rather than open while the protocol is unaudited: an
+    /// unrestricted factory would let anyone publish a vault that appears in
+    /// the same interface as reviewed ones.
+    mapping(address => bool) public isApprovedDeployer;
 
     event VaultDeployed(
         address indexed vault,
         address indexed shareToken,
         address indexed strategyExecutor,
         address riskManager,
-        address trader
+        address trader,
+        address deployer
     );
+    event DeployerApprovalUpdated(address indexed deployer, bool approved);
+
+    error NotApprovedDeployer(address caller);
+    error PerformanceFeeTooHigh(uint256 bps, uint256 max);
+    error BpsOutOfRange(uint256 bps);
+    error ZeroPositionCap();
+    error ZeroAddressBaseAsset();
+    error ZeroAddressTrader();
+    error ZeroAddressFeeRecipient();
+
+    /// @dev The owner is always permitted, so approving addresses is purely
+    /// additive and the owner can never lock itself out.
+    modifier onlyApprovedDeployer() {
+        if (msg.sender != owner() && !isApprovedDeployer[msg.sender]) {
+            revert NotApprovedDeployer(msg.sender);
+        }
+        _;
+    }
 
     struct DeployParams {
         IERC20 baseAsset;
@@ -45,7 +83,43 @@ contract VaultFactory is Ownable {
         oracle = oracle_;
     }
 
-    function deployVault(DeployParams calldata p) external onlyOwner returns (address vaultAddr) {
+    /// @notice Approve or revoke an address's ability to deploy vaults.
+    /// Revoking does not affect vaults that address has already deployed.
+    function setDeployer(address deployer, bool approved) external onlyOwner {
+        isApprovedDeployer[deployer] = approved;
+        emit DeployerApprovalUpdated(deployer, approved);
+    }
+
+    /// @notice Deploy a vault and its supporting contracts.
+    ///
+    /// Ownership of the Vault, RiskManager and StrategyExecutor goes to the
+    /// factory owner, not to the caller. That is deliberate: an approved
+    /// operator trades their vault but cannot widen its own risk caps or
+    /// reassign its own trader, so the caps stay a protocol guarantee rather
+    /// than an operator preference.
+    ///
+    /// `p.baseAsset` needs no explicit check here -- Vault's constructor
+    /// reads `decimals()` off it, which reverts for a non-token address.
+    function deployVault(DeployParams calldata p)
+        external
+        onlyApprovedDeployer
+        returns (address vaultAddr)
+    {
+        if (address(p.baseAsset) == address(0)) revert ZeroAddressBaseAsset();
+        if (p.trader == address(0)) revert ZeroAddressTrader();
+        if (p.feeRecipient == address(0)) revert ZeroAddressFeeRecipient();
+        if (p.performanceFeeBps > MAX_PERFORMANCE_FEE_BPS) {
+            revert PerformanceFeeTooHigh(p.performanceFeeBps, MAX_PERFORMANCE_FEE_BPS);
+        }
+        // A zero position cap reverts every trade, bricking the strategy.
+        if (p.caps.maxPositionSize == 0) revert ZeroPositionCap();
+        if (p.caps.maxSingleAssetBps > BPS_DENOMINATOR) {
+            revert BpsOutOfRange(p.caps.maxSingleAssetBps);
+        }
+        if (p.caps.maxDrawdownBps > BPS_DENOMINATOR) {
+            revert BpsOutOfRange(p.caps.maxDrawdownBps);
+        }
+
         address realOwner = owner();
 
         ShareToken shareToken = new ShareToken(p.shareName, p.shareSymbol, address(this));
@@ -73,7 +147,15 @@ contract VaultFactory is Ownable {
         vault.transferOwnership(realOwner);
 
         vaults.push(vaultAddr);
-        emit VaultDeployed(vaultAddr, address(shareToken), address(executor), address(riskManager), p.trader);
+        vaultDeployer[vaultAddr] = msg.sender;
+        emit VaultDeployed(
+            vaultAddr,
+            address(shareToken),
+            address(executor),
+            address(riskManager),
+            p.trader,
+            msg.sender
+        );
     }
 
     function vaultsCount() external view returns (uint256) {
