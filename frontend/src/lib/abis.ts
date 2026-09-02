@@ -165,6 +165,16 @@ export const vaultAbi = [
   },
 ] as const;
 
+export const strategyExecutorAbi = [
+  {
+    type: "function",
+    name: "trader",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+] as const;
+
 export const riskManagerAbi = [
   {
     type: "function",

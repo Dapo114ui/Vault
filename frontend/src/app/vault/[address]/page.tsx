@@ -10,7 +10,7 @@ import { ExplorerLink } from "@/components/ExplorerLink";
 import { RiskCaps } from "@/components/RiskCaps";
 import { VaultContracts } from "@/components/VaultContracts";
 import { HeroFigure, StatTile } from "@/components/StatTile";
-import { erc20Abi, riskManagerAbi, vaultAbi } from "@/lib/abis";
+import { erc20Abi, riskManagerAbi, strategyExecutorAbi, vaultAbi } from "@/lib/abis";
 import { ACTIVE_CHAIN_ID } from "@/lib/config";
 import { getDemoVault, IS_DEMO } from "@/lib/demo";
 import { drawdownBps, formatBps, formatCompact, formatToken, shortenAddress } from "@/lib/format";
@@ -75,6 +75,14 @@ export default function VaultPage() {
       bigint | undefined,
     ];
 
+  const { data: onChainTrader } = useReadContract({
+    address: strategyExecutorAddress,
+    abi: strategyExecutorAbi,
+    functionName: "trader",
+    chainId: ACTIVE_CHAIN_ID,
+    query: { enabled: !IS_DEMO && Boolean(strategyExecutorAddress) },
+  });
+
   const { data: onChainCaps } = useReadContract({
     address: riskManagerAddress,
     abi: riskManagerAbi,
@@ -93,6 +101,7 @@ export default function VaultPage() {
     : onChainFeeBps !== undefined
       ? Number(onChainFeeBps)
       : undefined;
+  const trader = demo ? demo.trader : onChainTrader;
   const baseSymbol = demo ? demo.baseSymbol : onChainBaseSymbol;
   const shareSymbol = demo ? demo.shareSymbol : onChainShareSymbol;
   const caps = demo
@@ -221,6 +230,7 @@ export default function VaultPage() {
             baseAssetAddress={baseAssetAddress}
             riskManagerAddress={riskManagerAddress}
             strategyExecutorAddress={strategyExecutorAddress}
+            trader={trader}
             feeRecipient={feeRecipient}
             feeBps={feeBps}
             shareSymbol={shareSymbol}

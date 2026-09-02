@@ -23,6 +23,7 @@ export type DemoVault = {
   highWaterMark: bigint;
   sharesOutstanding: bigint;
   performanceFeeBps: number;
+  trader: `0x${string}`;
   caps: {
     maxPositionSize: bigint;
     maxSingleAssetBps: number;
@@ -47,6 +48,7 @@ export const DEMO_VAULTS: DemoVault[] = [
     highWaterMark: e18("1.184"),
     sharesOutstanding: e18("348395"),
     performanceFeeBps: 2000,
+    trader: "0x7ad0000000000000000000000000000000000a01",
     caps: {
       maxPositionSize: e18("50000"),
       maxSingleAssetBps: 4000,
@@ -64,6 +66,7 @@ export const DEMO_VAULTS: DemoVault[] = [
     highWaterMark: e18("1.052"),
     sharesOutstanding: e18("265129"),
     performanceFeeBps: 1000,
+    trader: "0x7ad0000000000000000000000000000000000a02",
     caps: {
       maxPositionSize: e18("40000"),
       maxSingleAssetBps: 2500,
@@ -81,6 +84,7 @@ export const DEMO_VAULTS: DemoVault[] = [
     highWaterMark: e18("1.113"),
     sharesOutstanding: e18("101652"),
     performanceFeeBps: 1500,
+    trader: "0x7ad0000000000000000000000000000000000a03",
     caps: {
       maxPositionSize: e18("25000"),
       maxSingleAssetBps: 6000,
