@@ -461,13 +461,64 @@ audit before anyone else's money goes in.
 > adjectives. Second, if you are not solo, say who else and what they do —
 > a two-person team with named roles reads better than a vague "we".
 
+## Telegram
+
+```
+@Oladapo2003
+```
+
+## Team size
+
+```
+1
+```
+
+## How did you hear about Grant Program?
+
+Not required. "Word of Mouth" is fine.
+
+## "Other details, milestones, or contributions…" (final, optional field)
+
+Not required — and the last thing a reviewer reads, so worth using. This adds
+what the structured fields have no room for: an ecosystem contribution beyond
+the project itself, and a question that opens a conversation.
+
+```
+Three things the fields above leave no room for.
+
+First, everything claimed in this application is checkable. The contracts are
+public and deployed, the deposit and withdrawal are on-chain at block
+10310728, and every milestone KPI is countable from event logs rather than
+reported by me. I would rather be held to numbers a reviewer can verify
+independently than to a narrative.
+
+Second, a design decision that shows the posture I am building with. The
+emergency pause halts deposits and strategy trading, but deliberately cannot
+block withdrawals — an emergency switch that could strand depositors would
+contradict the whole reason the vault holds its own funds. There is a test
+asserting a depositor withdraws in full while the vault is paused.
+
+Third, a contribution beyond this project. Phase 1 requires verifying
+Ecodex's deployed router ABI, which is not publicly documented as far as I
+can find. I will publish what I learn — the interface, any deviations from
+the standard AMM shape, and working integration code — in the public
+repository, so the next team integrating Ecodex does not repeat the work.
+The same applies to DIA feed keys on X1.
+
+On distribution: the $100K Galxe Starboard campaign looks like the natural
+channel for Milestone 4's depositor targets, since it exists to drive exactly
+this kind of engagement. I would welcome a pointer on whether ecosystem
+projects can propose Starboard quests.
+```
+
 ## Still needed from you
 
-- **Project X handle** — required field, still blank.
-- **Applicant name, email and bio** — only you have these. The bio scaffold
-  above marks exactly what is missing.
-- **Anything after Applicant Bio.** A payout wallet and possibly KYC
-  questions are likely still below. Screenshot and I will finish the set.
+- **A background sentence in the bio.** The draft opens with a name and goes
+  straight to the project; there is nothing about who you are. See the note
+  under *Applicant Bio*.
+
+Note: the form ends at the optional details field — **no payout wallet is
+collected at application stage**, so that comes later if you are accepted.
 
 ## Facts to have ready for later fields
 
