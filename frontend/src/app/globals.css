@@ -14,11 +14,16 @@
   --text-secondary: #52514e;
   --text-muted: #83827c;
 
-  /* Aqua-green accent: ties to X1 EcoChain's eco identity. Used for chrome
-     and marks, never for text on the page surface. */
-  --accent: #1baf7a;
-  --accent-ink: #0b3d2b;
-  --accent-soft: #e6f6ef;
+  /* Brand green, taken from the X1 Vault mark. Mark-only: on white it sits
+     near 1.9:1, so it is never used for text or as a button ground. */
+  --brand: #00cf6a;
+
+  /* The interactive sibling: same hue, darkened until white text on it
+     clears 4.5:1, so buttons and links can use it safely. */
+  --accent: #0c7c52;
+  --accent-on: #ffffff; /* text placed on the accent ground */
+  --accent-ink: #06301f;
+  --accent-soft: #e3f4ec;
 
   --good: #0ca30c;
   --warning: #fab219;
@@ -37,9 +42,13 @@
     --text-secondary: #c3c2b7;
     --text-muted: #8e8d84;
 
-    --accent: #199e70;
-    --accent-ink: #d8f3e8;
-    --accent-soft: #14312a;
+    /* On the dark ground the brand green is legible as-is, so the accent
+       moves toward it rather than away. */
+    --brand: #00e074;
+    --accent: #2fd98a;
+    --accent-on: #06231a;
+    --accent-ink: #04241a;
+    --accent-soft: #103224;
   }
 }
 
@@ -54,9 +63,11 @@
   --text-secondary: #c3c2b7;
   --text-muted: #8e8d84;
 
-  --accent: #199e70;
-  --accent-ink: #d8f3e8;
-  --accent-soft: #14312a;
+  --brand: #00e074;
+  --accent: #2fd98a;
+  --accent-on: #06231a;
+  --accent-ink: #04241a;
+  --accent-soft: #103224;
 }
 
 @theme inline {
@@ -68,7 +79,9 @@
   --color-ink: var(--text-primary);
   --color-ink-secondary: var(--text-secondary);
   --color-ink-muted: var(--text-muted);
+  --color-brand: var(--brand);
   --color-accent: var(--accent);
+  --color-accent-on: var(--accent-on);
   --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
   --color-good: var(--good);

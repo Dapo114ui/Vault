@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vault — X1 EcoChain",
-  description: "Pro-rata share vaults trading through Ecodex, scoped for the X1 EcoChain grant program.",
+  title: "X1 Vault",
+  description:
+    "Pro-rata share vaults on X1 EcoChain. The trader moves the money but can never take it, and the risk caps are enforced on-chain.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

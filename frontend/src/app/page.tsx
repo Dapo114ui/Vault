@@ -41,7 +41,7 @@ export default function Overview() {
           {showPosition ? "Your position" : "Total value locked"}
         </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-ink">
-          {showPosition ? "Your vault" : "Vault protocol"}
+          X1 Vault
         </h1>
         <p className="mt-1.5 text-sm text-ink-muted">
           Pro-rata shares in strategy vaults, with risk caps enforced on-chain.
@@ -76,7 +76,7 @@ export default function Overview() {
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
               href="/strategies"
-              className="rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              className="rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-accent-on transition-opacity hover:opacity-90"
             >
               Deposit assets
             </Link>

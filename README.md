@@ -1,4 +1,4 @@
-# Vault — X1 EcoChain DeFi Grant Scope
+# X1 Vault
 
 A single-strategy, factory-deployed vault product being scoped for the
 [X1 EcoChain Grant Program](https://grant.x1ecochain.com/) ($5M pool,

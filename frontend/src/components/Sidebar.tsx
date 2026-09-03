@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Wordmark } from "./Logo";
 import {
   BookIcon,
   DOCS_URL,
@@ -19,19 +20,8 @@ export function Sidebar() {
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border-subtle bg-surface-1 lg:flex">
       <div className="px-5 py-5">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span
-            aria-hidden
-            className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-sm font-bold text-white"
-          >
-            V
-          </span>
-          <span>
-            <span className="block text-sm font-semibold leading-tight text-ink">Vault</span>
-            <span className="block text-[10px] uppercase tracking-widest text-ink-muted">
-              Protocol
-            </span>
-          </span>
+        <Link href="/" aria-label="X1 Vault home" className="inline-block">
+          <Wordmark className="h-7 w-auto text-ink" />
         </Link>
       </div>
 

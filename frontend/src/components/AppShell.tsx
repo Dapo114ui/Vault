@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConnectButton } from "./ConnectButton";
+import { LogoMark } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NetworkBanner } from "./NetworkBanner";
 import { Sidebar } from "./Sidebar";
@@ -25,7 +26,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="relative flex items-center justify-between gap-3 border-b border-border-subtle px-4 py-3.5 sm:px-6">
           <MobileNav />
           <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-sm">
-            <Link href="/" className="shrink-0 text-ink-muted hover:text-ink">
+            <Link href="/" aria-label="X1 Vault home" className="shrink-0 lg:hidden">
+              <LogoMark className="h-5 w-auto text-ink" />
+            </Link>
+            <Link href="/" className="hidden shrink-0 text-ink-muted hover:text-ink lg:inline">
               Vault
             </Link>
             {crumb && (

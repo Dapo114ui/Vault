@@ -349,7 +349,7 @@ export default function TradePage() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-on transition-opacity hover:opacity-90 disabled:opacity-40"
           >
             {status === "trading"
               ? "Trading…"

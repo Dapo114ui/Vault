@@ -1,4 +1,4 @@
-# X1 EcoChain Grant Application — draft
+# X1 Vault — X1 EcoChain Grant Application (draft)
 
 Category: **Finance & Commerce (DeFi)** · Form:
 `airtable.com/appMvL5KlSmE9J3I4/paglccI2kQaFErlF3/form`
@@ -17,13 +17,13 @@ Category: **Finance & Commerce (DeFi)** · Form:
 | Applicant | `[TO FILL]` — name / entity, and whether solo or a team |
 | Contact | `[TO FILL]` — email, Telegram or X handle |
 | Payout address | `[TO FILL]` — **a fresh wallet**, not the testnet deployer |
-| Amount requested | `[TO FILL]` — see *Budget*, which proposes $85,000 |
+| Amount requested | `[TO FILL]` — see *Budget*, which proposes $68,000 |
 
 ---
 
 ## One-line summary
 
-A vault protocol for X1: depositors buy pro-rata shares in a strategy vault,
+**X1 Vault** — a vault protocol for X1: depositors buy pro-rata shares in a strategy vault,
 a designated trader trades the pooled funds through Ecodex without ever
 taking custody, and hard risk caps enforced in the contract revert any trade
 that breaches them.
@@ -35,25 +35,44 @@ and usable today on the Maculatus testnet:
 
 | | |
 |---|---|
-| Live app | https://x1vault.vercel.app |
+| Live application | https://x1vault.vercel.app |
 | Source | https://github.com/Dapo114ui/Vault |
 | VaultFactory | `0x76830898D4deC2E2D71055a553896FDECA29B070` |
 | Vault (vUSDT) | `0x323fa03BB4437A0962131a405102A37D570A05FD` |
 | First deposit | block 10310728 |
 
-A real deposit and a real withdrawal have been executed end-to-end through
-the deployed frontend against these contracts — USDT in, shares minted
-pro-rata to NAV, shares burned, USDT out, balances reconciling exactly. The
-activity feed in the app reads those events straight back off-chain.
+A real deposit and a real withdrawal have run end-to-end through the deployed
+frontend against these contracts — USDT in, shares minted pro-rata to net
+asset value, shares burned, USDT out, balances reconciling exactly. The
+activity feed reads those events straight back off-chain.
 
-The contract suite has 20 passing tests covering pro-rata accounting, all
-three risk caps reverting on breach, high-water-mark fee behaviour through a
-drawdown-and-recovery cycle, and decimal handling across mixed-decimal
-assets.
+**40 passing tests** cover pro-rata accounting, all three risk caps reverting
+on breach, high-water-mark fee behaviour through a full drawdown-and-recovery
+cycle, decimal handling across mixed-decimal assets, the deployer allowlist,
+every deploy-parameter bound, and both operational guards.
 
-**What is deliberately not done yet:** no security audit, and trading is not
-switched on — the deployed vault holds only its base asset. Both are scoped
-below.
+Delivered beyond the core protocol, all of it in the repository:
+
+- **Operator allowlist and deploy-parameter bounds.** Vault creation is
+  curated while the protocol is unaudited, and the factory rejects a
+  confiscatory fee, a zero position cap, or a zero trader address outright.
+  An approved operator deploys and trades a vault but does **not** own it, so
+  they cannot widen their own risk caps.
+- **Deposit cap and pause.** A NAV ceiling for a guarded launch, and an
+  emergency stop that halts deposits and trading — but never withdrawals,
+  because a pause that stranded depositors would contradict the reason the
+  vault holds its own funds.
+- **Vault creation and trader interfaces.** An operator deploys a vault from
+  the browser; a vault's designated trader routes swaps from a console that
+  **simulates each trade against the deployed contracts** and refuses one
+  that would breach a risk cap, before any gas is spent.
+- **Disclosure.** Every vault names its trader, what that address can and
+  cannot do, and who receives the performance fee — including that the fee is
+  charged by minting shares, which dilutes holders rather than deducting from
+  a balance.
+
+**What is deliberately not done:** no security audit, and trading is not
+switched on. Both are scoped below, and they are what the grant is for.
 
 ## The problem
 
@@ -126,54 +145,88 @@ architecturally — which typically run continuous off-chain infrastructure —
 it adds TVL and useful transaction volume to X1's low-energy validator set
 without adding an always-on compute load beside it.
 
-## Delivery plan — 90 to 120 days
+## Delivery plan — what is left
 
-Deliberately phased. X1's mainnet target of Q1 2026 has slipped by two to
-three quarters with no new public date, so any plan promising mainnet
-trading on a fixed calendar date is promising something the applicant does
-not control. Everything below that carries a date is within our control;
-the one thing that is not is expressed relative to X1's own launch.
+Deliberately phased, and deliberately honest about how much is already done.
+X1's Q1 2026 mainnet target has slipped by two to three quarters with no new
+public date, so any plan promising mainnet trading on a fixed calendar date
+is promising something the applicant does not control. Everything dated below
+is within our control; the one thing that is not is expressed relative to X1's
+own launch.
 
-**Phase 0 — complete.** Contracts, tests, frontend, testnet deployment, and a
-verified deposit/withdraw round-trip on-chain. Delivered before applying.
+**Phase 0 — complete, and unfunded.** The protocol, its test suite, the
+deployed testnet contracts, the frontend, both operational guards, the
+allowlist, and the creation and trading interfaces. Delivered before applying
+and at our own cost. This is the evidence the rest of the plan is credible.
 
-**Phase 1, days 1–30 — trading on testnet.** Verify Ecodex's deployed router
-ABI against our interface and correct it if it differs; integrate DIA price
-feeds for non-base assets with staleness rejection; deploy a trading-enabled
-vault to Maculatus and demonstrate a strategy trade with the risk caps
-firing on a deliberate breach. *Milestone: a public testnet vault that
-trades.*
+**Phase 1, days 1–25 — trading live.** The integration code exists; what does
+not exist is confirmation of the external interface. Verify Ecodex's deployed
+router ABI against ours and correct it if it differs, wire DIA price feeds
+with the staleness rejection already implemented, redeploy the factory
+carrying the allowlist, bounds and guards, and demonstrate a strategy trade
+with a risk cap firing on a deliberate breach. *Milestone: a public testnet
+vault that trades.*
 
-**Phase 2, days 30–75 — audit.** Engage an audit firm, remediate findings,
-publish the report in the repository. This is the long pole and the reason
-the grant is worth more than the code. *Milestone: published audit report
-and remediation commits.*
+**Phase 2, days 15–70 — audit.** The dominant cost and the long pole. Engage
+a firm, remediate findings, publish the report in the repository. Starts in
+parallel with Phase 1 because the contracts under audit are already written.
+*Milestone: published report and remediation commits.*
 
-**Phase 3, days 75–110 — production hardening and GTM.** Deposit caps for a
-guarded launch, an emergency pause, subgraph or indexer for historical
-performance, strategy operator documentation, and onboarding for the first
-external strategy operators. *Milestone: two external operators running
-testnet vaults.*
+**Phase 3, days 60–100 — indexing and operator onboarding.** A subgraph or
+indexer so performance history survives beyond an RPC's log window — the one
+substantial piece of product work still outstanding. Then operator
+documentation and onboarding for the first external strategy operators.
+*Milestone: two external operators running testnet vaults.*
 
-**Phase 4 — mainnet, gated on X1.** Mainnet deployment within **three weeks
-of Ecodex having live mainnet liquidity**. Stated as a dependency rather
-than a date, because it is one.
+**Phase 4 — mainnet, gated on X1.** Deployment within three weeks of Ecodex
+having live mainnet liquidity. Stated as a dependency rather than a date,
+because it is one.
 
-## Budget — proposed $85,000
+## Budget — $68,000 requested
 
 `[TO FILL: adjust to your actual costs and time]`
 
+The ask is lower than the engineering-heavy figure this project would have
+asked for a month ago, because a month ago the engineering had not been done.
+What remains is dominated by the one thing that cannot be self-served: an
+independent security review of a protocol that holds other people's money.
+
 | Line | Amount | Note |
 |---|---|---|
-| Security audit | $35,000 | The single largest item and the main reason to fund this rather than let it ship unaudited |
-| Engineering, ~3.5 months | $34,000 | Phases 1–3 |
-| Frontend, indexing, infrastructure | $9,000 | Subgraph/indexer, hosting, monitoring |
-| Contingency | $7,000 | Audit remediation overrun |
+| Security audit and remediation | $40,000 | 59% of the request. More surface than the original scope, since the allowlist, bounds and guards all ship into it |
+| Engineering — Phase 1 and Phase 3 | $12,000 | Router/oracle integration, then the indexer |
+| Indexing and infrastructure | $6,000 | Subgraph hosting, monitoring, RPC |
+| Go-to-market and operator onboarding | $10,000 | The weakest part of this application and the part code cannot fix — see *Go-to-market* |
+| **Total** | **$68,000** | |
 
-The floor that still produces something worth having is **$45,000** — audit
-plus Phase 1 only, dropping the operator-onboarding work. Below that the
-audit cannot be paid for, and an unaudited vault holding other people's
-money is not something worth shipping.
+The floor that still produces something worth having is **$42,000** — audit
+and remediation alone, with Phase 1 absorbed by us as Phase 0 was. Below
+that the audit cannot be paid for, and shipping an unaudited vault that holds
+other people's money is not something we are willing to do.
+
+## Go-to-market
+
+The honest position: this is the weakest part of the application, and it is
+the part no amount of engineering fixes. The contracts work; what they need
+is depositors.
+
+**The lever we intend to use is X1's own.** The $100K Galxe Starboard
+campaign was announced alongside this grant program specifically to drive
+community engagement. A quest that requires depositing into a vault and
+holding shares would put real testnet users through the contracts and produce
+exactly the measurable on-chain activity this program asks to see — using
+X1's existing distribution rather than asking a new project to build an
+audience from nothing. `[TO FILL: confirm Starboard quests are open to
+ecosystem projects, and who to approach.]`
+
+**Operators before depositors.** Each approved strategy operator arrives with
+their own following, so onboarding two operators is a cheaper route to
+depositor count than acquiring depositors directly. That is why the allowlist
+and the self-serve creation flow were built before applying.
+
+**What the budget line pays for:** quest design and rewards, operator
+outreach, and documentation good enough that an operator can run a vault
+without us.
 
 ## Metrics we will be judged on
 
