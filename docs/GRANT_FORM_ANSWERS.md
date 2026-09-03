@@ -433,49 +433,59 @@ Live on Testnet
 Founder & Developer
 ```
 
-> Accurate for a solo builder, and better than inflating to "CEO" for a
-> one-person project — reviewers read that as a signal about judgement.
-> If someone is working with you, say "Founder" and cover the split in the
-> bio.
+> Still accurate with a small team, since you write the code: it describes
+> what you do, and the bio covers everyone else. Better than inflating to
+> "CEO" for a team this size — reviewers read that as a signal about
+> judgement.
 
 ## Applicant Bio
 
 Written from what you have told me and nothing else. The opening paragraph
 claims no employer, no years of experience and no prior shipped protocol,
 because I do not know of any — if you have them, they belong here and they
-are stronger than what is written. What is below is true as it stands.
+are stronger than what is written. The roles in the second paragraph are
+left blank because only you know who does what; fill them in with real
+names and real responsibilities.
 
 ```
 I am a web3 enthusiast and an independent developer. I came into this space
 as a user rather than through a job in it — following DeFi protocols, using
 them, and paying attention to how they fail. X1 Vault is the point where
 that turned into building something instead of only watching it. I have no
-audited protocol behind me and no team; what I have is this one, written and
-deployed myself, and public from the first commit.
+audited protocol behind me; what I have is this one, and it has been public
+from the first commit.
 
-I built X1 Vault as a solo project, starting from a blank repository on
-30 August 2026. In that time it has gone from nothing to a five-contract
-suite with 40 passing tests, deployed to the X1 Maculatus testnet, with a
-public frontend and a verified deposit-and-withdrawal round-trip on-chain
-at block 10310728. Everything is public at
-github.com/Dapo114ui/Vault and x1vault.xyz.
+X1 Vault is built by a small team. I write the contracts, the test suite and
+the deployment; [TO FILL — name] handles design and the interface;
+[TO FILL — name and role]. We started from a blank repository on 30 August
+2026. In that time it has gone from nothing to a five-contract suite with
+40 passing tests, deployed to the X1 Maculatus testnet, with a public
+frontend and a verified deposit-and-withdrawal round-trip on-chain at block
+10310728. Everything is public at github.com/Dapo114ui/Vault and
+x1vault.xyz.
 
 [TO FILL — why this problem, in one or two sentences. What drew you to
 custody-free managed exposure specifically? A reviewer is deciding whether
 you will still be working on this in six months, and the honest reason is
 more persuasive than a market-size argument.]
 
-I am not asking this grant to build the protocol — that part is done and
-public. I am asking for what I cannot do alone: an independent security
-audit before anyone else's money goes in.
+We are not asking this grant to build the protocol — that part is done and
+public. We are asking for the one thing we cannot do ourselves: an
+independent security audit before anyone else's money goes in.
 ```
 
-> Three notes. First, the middle paragraph is the strongest thing you can
-> say and it is entirely verifiable, so lead with substance rather than
+> Four notes. First, the third paragraph is the strongest thing you can say
+> and it is entirely verifiable, so lead with substance rather than
 > adjectives. Second, if your own "why" paragraph already makes the custody
 > argument, cut the overlap from the opening rather than saying it twice.
-> Third, if you are not solo, say who else and what they do — a two-person
-> team with named roles reads better than a vague "we".
+> Third, name people and give each a distinct responsibility — a vague "we
+> are a team of four" is weaker than solo, because it invites the reviewer
+> to ask which four. Fourth, and the one to think hardest about: **the
+> repository has a single committer on every commit.** A reviewer who reads
+> "a small team" and then opens GitHub sees one author. That is fine if the
+> roles you list explain it — design, community, operations, or people who
+> joined after the contracts were written — and damaging if they do not. If
+> anyone else writes code, get their commits in before submitting.
 
 ## Telegram
 
@@ -486,8 +496,12 @@ audit before anyone else's money goes in.
 ## Team size
 
 ```
-1
+2-5
 ```
+
+> Count only people who have actually done work or committed to doing it in
+> the next 100 days. The bracket is not a claim about headcount alone — the
+> bio has to make it real with names and roles, or the number does nothing.
 
 ## How did you hear about Grant Program?
 
