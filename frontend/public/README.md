@@ -9,6 +9,13 @@ brand.
 |---|---|---|
 | Wordmark | `logo.svg`, `logo.png`, `logo.webp` | Sidebar lockup |
 | Mark | `logo-mark.svg`, `logo-mark.png`, `logo-mark.webp` | Mobile header, tight spots |
+| Share card | `og.png` | Link previews on X, Telegram, Slack, the grant form |
+
+`og.png` should be **1200×630**. It is referenced by the page metadata
+already, so dropping the file in is the whole install — until then a shared
+link renders as a text-only card, which works but is easy to improve. The
+rendered 3D logo is a good fit here, since this is exactly the large-format
+context it was made for.
 
 Drop a file in and commit. No code change needed.
 

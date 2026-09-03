@@ -35,7 +35,7 @@ and usable today on the Maculatus testnet:
 
 | | |
 |---|---|
-| Live application | https://x1vault.vercel.app |
+| Live application | https://x1vault.xyz |
 | Source | https://github.com/Dapo114ui/Vault |
 | VaultFactory | `0x76830898D4deC2E2D71055a553896FDECA29B070` |
 | Vault (vUSDT) | `0x323fa03BB4437A0962131a405102A37D570A05FD` |

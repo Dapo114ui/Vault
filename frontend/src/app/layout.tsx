@@ -14,10 +14,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE = "https://x1vault.xyz";
+const DESCRIPTION =
+  "Pro-rata share vaults on X1 EcoChain. The trader moves the money but can never take it, and the risk caps are enforced on-chain.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE),
   title: "X1 Vault",
-  description:
-    "Pro-rata share vaults on X1 EcoChain. The trader moves the money but can never take it, and the risk caps are enforced on-chain.",
+  description: DESCRIPTION,
+  // og.png is not committed yet; crawlers that cannot fetch it simply render
+  // a text card, so dropping a 1200x630 file at public/og.png upgrades every
+  // shared link with no code change.
+  openGraph: {
+    type: "website",
+    url: SITE,
+    siteName: "X1 Vault",
+    title: "X1 Vault",
+    description: DESCRIPTION,
+    images: ["/og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "X1 Vault",
+    description: DESCRIPTION,
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -97,7 +97,7 @@ PHASE 0 — COMPLETE BEFORE APPLYING, SELF-FUNDED
 Ended 2 September 2026.
 Delivered: the full contract suite (Vault, ShareToken, RiskManager,
 StrategyExecutor, VaultFactory) with 40 passing tests; deployment to X1
-Maculatus testnet; a live frontend at x1vault.vercel.app; a verified
+Maculatus testnet; a live frontend at x1vault.xyz; a verified
 deposit-and-withdrawal round-trip on-chain at block 10310728; an operator
 allowlist with bounds on every deploy parameter; a deposit cap and an
 emergency pause that never blocks withdrawals; a browser vault-creation flow;
@@ -143,7 +143,7 @@ a deposit cap, a guarded ramp as the cap is raised, and monitoring.
 ## Project website
 
 ```
-https://x1vault.vercel.app
+https://x1vault.xyz
 ```
 
 Consider also giving the repository, since the code is the strongest part of
@@ -444,7 +444,7 @@ I built X1 Vault as a solo project, starting from a blank repository on
 suite with 40 passing tests, deployed to the X1 Maculatus testnet, with a
 public frontend and a verified deposit-and-withdrawal round-trip on-chain
 at block 10310728. Everything is public at
-github.com/Dapo114ui/Vault and x1vault.vercel.app.
+github.com/Dapo114ui/Vault and x1vault.xyz.
 
 [TO FILL — why this problem, in one or two sentences. What drew you to
 custody-free managed exposure specifically? A reviewer is deciding whether
@@ -475,7 +475,7 @@ audit before anyone else's money goes in.
 |---|---|
 | Amount requested | $68,000 (floor $42,000 — audit only) |
 | Payout wallet | A **fresh** address. Not the testnet deployer, and not any account whose key has been shared anywhere. |
-| Live app | https://x1vault.vercel.app |
+| Live app | https://x1vault.xyz |
 | Repository | https://github.com/Dapo114ui/Vault |
 | VaultFactory | `0x76830898D4deC2E2D71055a553896FDECA29B070` |
 | Vault (vUSDT) | `0x323fa03BB4437A0962131a405102A37D570A05FD` |

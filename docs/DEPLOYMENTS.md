@@ -43,6 +43,10 @@ redeploy on them alone.
 
 ## Frontend
 
+Live at **https://x1vault.xyz** (custom domain; the Vercel-generated
+`x1vault.vercel.app` still resolves and is the fallback).
+
+
 The Vercel deployment needs three variables, which are what
 `scripts/deploy-x1.js` prints at the end of a run:
 

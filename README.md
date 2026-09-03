@@ -9,7 +9,8 @@ profit above the vault's all-time-high NAV/share is charged a performance
 fee at withdrawal, with hard, on-chain risk caps enforced on every trade.
 
 A deposit-and-withdraw-only v1 is **live on X1's Maculatus testnet**
-(chain ID `10778`) — addresses in `docs/DEPLOYMENTS.md`. Trading through
+(chain ID `10778`) at **https://x1vault.xyz** — addresses in
+`docs/DEPLOYMENTS.md`. Trading through
 Ecodex is not enabled yet; see "What's intentionally not here yet" below.
 
 See `docs/RESEARCH_NOTES.md` for the market research behind the scoping
