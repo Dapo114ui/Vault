@@ -240,7 +240,18 @@ SwapExecuted events. None of them depend on our own reporting.
 
 No milestone is gated on X1 mainnet. Its target has moved, and tying a
 payment schedule to a date outside our control would not be honest.
+
+If the full amount is not available: $42,000 covers Milestones 2 and 3 --
+the audit and its remediation -- with Phase 1 absorbed at our own cost as
+Phase 0 was, and Milestone 4's adoption targets scaled back with it. Below
+that the audit cannot be paid for, and shipping an unaudited vault that
+holds other people's money is not something we are willing to do.
 ```
+
+> The floor is stated so that a reviewer with a smaller allocation has an
+> option other than rejecting. Note that the reduction buys *less scope*
+> rather than the same work at a discount — a bare "we would accept
+> $42,000" only anchors the decision to $42,000.
 
 ## Milestone 1
 
