@@ -14,7 +14,7 @@ Category: **Finance & Commerce (DeFi)** · Form:
 
 | | |
 |---|---|
-| Applicant | `[TO FILL]` — your name and your designer's; two people, no entity |
+| Applicant | `[TO FILL]` — your name; solo, no entity |
 | Contact | `[TO FILL]` — email, Telegram or X handle |
 | Payout address | `[TO FILL]` — **a fresh wallet**, not the testnet deployer |
 | Amount requested | `[TO FILL]` — see *Budget*, which proposes $68,000 |
@@ -284,12 +284,11 @@ returns, and the interface says so rather than advertising a projected APY.
 
 ## Team
 
-Two people, no company. `[TO FILL — applicant name]` writes the contracts,
-the test suite and the application; `[TO FILL — designer name]` handles
-design and interface work. Everything below the surface of this application
-was built by the two of us before applying and at our own cost.
+One person, no company. `[TO FILL — applicant name]` wrote the contracts,
+the test suite, the deployment and the frontend, before applying and at
+their own cost.
 
-Stated plainly because it is checkable: neither of us arrives with an
-audited protocol behind us. What we bring instead is this one — deployed,
-public, and reconciling on-chain — which is a stronger claim than a résumé
-about work nobody can inspect.
+Stated plainly because it is checkable: no audited protocol behind us, and
+no team to point at. What stands in for both is this one — deployed, public,
+and reconciling on-chain — which is a stronger claim than a résumé about
+work nobody can inspect.

@@ -422,10 +422,10 @@ Live on Testnet
 Founder & Developer
 ```
 
-> Still accurate with a designer on the team, since you write the code:
-> "Founder & Developer" describes what you do, and the bio covers the split.
-> Better than inflating to "CEO" for a two-person project — reviewers read
-> that as a signal about judgement.
+> Accurate for a solo builder, and better than inflating to "CEO" for a
+> one-person project — reviewers read that as a signal about judgement.
+> If someone is working with you, say "Founder" and cover the split in the
+> bio.
 
 ## Applicant Bio
 
@@ -439,16 +439,15 @@ I am a web3 enthusiast and an independent developer. I came into this space
 as a user rather than through a job in it — following DeFi protocols, using
 them, and paying attention to how they fail. X1 Vault is the point where
 that turned into building something instead of only watching it. I have no
-audited protocol behind me; what I have is this one, written and deployed
-myself, and public from the first commit.
+audited protocol behind me and no team; what I have is this one, written and
+deployed myself, and public from the first commit.
 
-X1 Vault is built by two people. I write the contracts, the tests and the
-application logic; [TO FILL — designer's name] handles design and interface
-work. We started from a blank repository on 30 August 2026. In that time it
-has gone from nothing to a five-contract suite with 40 passing tests,
-deployed to the X1 Maculatus testnet, with a public frontend and a verified
-deposit-and-withdrawal round-trip on-chain at block 10310728. Everything is
-public at github.com/Dapo114ui/Vault and x1vault.xyz.
+I built X1 Vault as a solo project, starting from a blank repository on
+30 August 2026. In that time it has gone from nothing to a five-contract
+suite with 40 passing tests, deployed to the X1 Maculatus testnet, with a
+public frontend and a verified deposit-and-withdrawal round-trip on-chain
+at block 10310728. Everything is public at
+github.com/Dapo114ui/Vault and x1vault.xyz.
 
 [TO FILL — why this problem, in one or two sentences. What drew you to
 custody-free managed exposure specifically? A reviewer is deciding whether
@@ -464,10 +463,8 @@ audit before anyone else's money goes in.
 > say and it is entirely verifiable, so lead with substance rather than
 > adjectives. Second, if your own "why" paragraph already makes the custody
 > argument, cut the overlap from the opening rather than saying it twice.
-> Third, naming the split matters more than it looks: the repository has a
-> single committer on every commit, and a reviewer who reads "two people"
-> without being told who does what will notice. Saying that one of you does
-> design explains the commit history rather than contradicting it.
+> Third, if you are not solo, say who else and what they do — a two-person
+> team with named roles reads better than a vague "we".
 
 ## Telegram
 
@@ -478,12 +475,8 @@ audit before anyone else's money goes in.
 ## Team size
 
 ```
-2
+1
 ```
-
-> Count only people who have actually done work or committed to doing it.
-> Two with named, distinct roles is credible; a padded number that the
-> repository contradicts is not.
 
 ## How did you hear about Grant Program?
 
@@ -525,15 +518,14 @@ projects can propose Starboard quests.
 
 ## Still needed from you
 
-- **Your name and email**, and **your designer's name** in the bio's second
-  paragraph.
+- **Your name and email**, which are the only fields left blank.
 - **A read-through of the bio's opening paragraph.** It is written from what
   you have said about yourself and deliberately claims nothing more. If any
   of it is off, change it — an inaccurate bio is worse than a thin one.
-- **The logo assets**, which are your designer's lane and the one visible
-  gap: `frontend/public/` still has no `logo.svg` or `logo.png`, so the live
-  app renders a drawn fallback. A reviewer will open x1vault.xyz. Dropping
-  the files in is the whole install — no code change needed.
+- **The logo assets**, which are the one visible gap: `frontend/public/`
+  still has no `logo.svg` or `logo.png`, so the live app renders a drawn
+  fallback rather than the real mark. A reviewer will open x1vault.xyz.
+  Dropping the files in is the whole install — no code change needed.
 
 Note: the form ends at the optional details field — **no payout wallet is
 collected at application stage**, so that comes later if you are accepted.
