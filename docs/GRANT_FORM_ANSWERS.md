@@ -363,12 +363,111 @@ Amount Requested: $12,000
 > the application and ask for a higher upfront — that is a normal negotiation
 > and far better than missing a milestone on timing.
 
+## Current Development Stage
+
+```
+Mid-Stage (product on testnet closed beta)
+```
+
+> **Not Late-Stage, and the distinction matters.** "Late-Stage (product live
+> with onchain metrics)" is tempting — it *is* live and there *are* onchain
+> metrics. But the metrics are one deposit and one withdrawal, both yours,
+> and vault creation is allowlisted. That is a closed beta by any honest
+> reading. The rest of this application is scrupulously accurate about what
+> exists and what does not; overclaiming in a dropdown is exactly the
+> inconsistency a reviewer would notice and then re-read everything else
+> looking for.
+
+## Duration working on the project
+
+```
+0-3 months
+```
+
+> **Be ready for this one.** The public repository's first commit is
+> 30 August 2026. A reviewer who opens GitHub sees a project a few days old,
+> so the honest answer is the only workable one — and it is also a strong
+> one, if you frame it. In four days this went from nothing to a five-contract
+> suite with 40 passing tests, a testnet deployment, a live frontend, and a
+> verified on-chain deposit and withdrawal. Say that in the bio rather than
+> hoping nobody checks the commit dates. Velocity is a real signal; a project
+> that claims a year of work with a four-day-old repository is a dead
+> application.
+
+## Project live status
+
+```
+Live on Testnet
+```
+
+## Applicant Full Name
+
+```
+[TO FILL] — your legal name, matching whatever ID you would use for KYC
+```
+
+## Applicant Email
+
+```
+[TO FILL]
+```
+
+> If you have a project or professional address, use it. A personal one is
+> fine too — grant committees care far more that it is monitored than what
+> the domain is. Use an address you will actually check daily for the next
+> three months.
+
+## Applicant Job Title
+
+```
+Founder & Developer
+```
+
+> Accurate for a solo builder, and better than inflating to "CEO" for a
+> one-person project — reviewers read that as a signal about judgement.
+> If someone is working with you, say "Founder" and cover the split in the
+> bio.
+
+## Applicant Bio
+
+**I cannot write this one for you, and you should not let me.** I do not know
+your background, and a fabricated bio in a funding application is fraud, not
+positioning. What follows is a structure with your facts left blank.
+
+```
+[TO FILL — your background: what you have built or worked on before, your
+technical or professional experience, and anything that makes you credible
+as the person who will ship this. Two or three sentences.]
+
+I built X1 Vault as a solo project, starting from a blank repository on
+30 August 2026. In that time it has gone from nothing to a five-contract
+suite with 40 passing tests, deployed to the X1 Maculatus testnet, with a
+public frontend and a verified deposit-and-withdrawal round-trip on-chain
+at block 10310728. Everything is public at
+github.com/Dapo114ui/Vault and x1vault.vercel.app.
+
+[TO FILL — why this problem, in one or two sentences. What drew you to
+custody-free managed exposure specifically? A reviewer is deciding whether
+you will still be working on this in six months, and the honest reason is
+more persuasive than a market-size argument.]
+
+I am not asking this grant to build the protocol — that part is done and
+public. I am asking for what I cannot do alone: an independent security
+audit before anyone else's money goes in.
+```
+
+> Two notes. First, the middle paragraph is the strongest thing you can say
+> and it is entirely verifiable, so lead with substance rather than
+> adjectives. Second, if you are not solo, say who else and what they do —
+> a two-person team with named roles reads better than a vague "we".
+
 ## Still needed from you
 
-- **Project X handle** — required field.
-- **Anything between "Project X" and "Previous Funding"**, and anything after
-  Milestone 4. Team background and a payout wallet are almost certainly
-  there.
+- **Project X handle** — required field, still blank.
+- **Applicant name, email and bio** — only you have these. The bio scaffold
+  above marks exactly what is missing.
+- **Anything after Applicant Bio.** A payout wallet and possibly KYC
+  questions are likely still below. Screenshot and I will finish the set.
 
 ## Facts to have ready for later fields
 
