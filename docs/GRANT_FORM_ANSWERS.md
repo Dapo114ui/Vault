@@ -152,13 +152,12 @@ this application: `https://github.com/Dapo114ui/Vault`
 ## Project X
 
 ```
-[TO FILL] — your X / Twitter handle
+https://x.com/x1_vault
 ```
 
-> The field is required. If there is no account yet, make one before
-> submitting: an empty or missing handle on a grant application reads as an
-> abandoned project, and it costs ten minutes. Even a single pinned post with
-> the live app link and the testnet contract address is better than nothing.
+> Worth ten minutes before you submit: a pinned post with the live app link
+> and the testnet vault address. A reviewer who opens the handle and finds an
+> empty timeline learns something you would rather they did not.
 
 ---
 
@@ -430,14 +429,18 @@ Founder & Developer
 
 ## Applicant Bio
 
-**I cannot write this one for you, and you should not let me.** I do not know
-your background, and a fabricated bio in a funding application is fraud, not
-positioning. What follows is a structure with your facts left blank.
+Written from what you have told me and nothing else. The opening paragraph
+claims no employer, no years of experience and no prior shipped protocol,
+because I do not know of any — if you have them, they belong here and they
+are stronger than what is written. What is below is true as it stands.
 
 ```
-[TO FILL — your background: what you have built or worked on before, your
-technical or professional experience, and anything that makes you credible
-as the person who will ship this. Two or three sentences.]
+I am a web3 enthusiast and an independent developer. I came into this space
+as a user rather than through a job in it — following DeFi protocols, using
+them, and paying attention to how they fail. X1 Vault is the point where
+that turned into building something instead of only watching it. I have no
+audited protocol behind me and no team; what I have is this one, written and
+deployed myself, and public from the first commit.
 
 I built X1 Vault as a solo project, starting from a blank repository on
 30 August 2026. In that time it has gone from nothing to a five-contract
@@ -456,10 +459,12 @@ public. I am asking for what I cannot do alone: an independent security
 audit before anyone else's money goes in.
 ```
 
-> Two notes. First, the middle paragraph is the strongest thing you can say
-> and it is entirely verifiable, so lead with substance rather than
-> adjectives. Second, if you are not solo, say who else and what they do —
-> a two-person team with named roles reads better than a vague "we".
+> Three notes. First, the middle paragraph is the strongest thing you can
+> say and it is entirely verifiable, so lead with substance rather than
+> adjectives. Second, if your own "why" paragraph already makes the custody
+> argument, cut the overlap from the opening rather than saying it twice.
+> Third, if you are not solo, say who else and what they do — a two-person
+> team with named roles reads better than a vague "we".
 
 ## Telegram
 
@@ -513,9 +518,10 @@ projects can propose Starboard quests.
 
 ## Still needed from you
 
-- **A background sentence in the bio.** The draft opens with a name and goes
-  straight to the project; there is nothing about who you are. See the note
-  under *Applicant Bio*.
+- **Your name and email**, which are the only fields left blank.
+- **A read-through of the bio's opening paragraph.** It is written from what
+  you have said about yourself and deliberately claims nothing more. If any
+  of it is off, change it — an inaccurate bio is worse than a thin one.
 
 Note: the form ends at the optional details field — **no payout wallet is
 collected at application stage**, so that comes later if you are accepted.
