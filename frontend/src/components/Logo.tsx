@@ -5,14 +5,17 @@ import { useState } from "react";
 /**
  * The X1 Vault logo.
  *
- * It renders `public/logo.svg` (or `logo-mark.svg` for the monogram) when
- * that file exists, and falls back to the drawn version below when it does
- * not. Drop the real asset in and it is picked up with no code change; the
- * fallback only exists so the app is never unbranded in the meantime.
+ * Tries the real asset first and falls back to a drawn placeholder only if
+ * none is present, so dropping a file into `public/` is the whole install.
+ * Candidates are tried in order: SVG scales cleanly at chrome sizes, so it
+ * wins where both exist.
  *
- * The drawn version is a reconstruction by eye and is not the real mark —
- * treat it as a placeholder, not as the brand.
+ * The drawn fallback is an approximation, not the brand. It exists so the
+ * app is never unbranded, not as a substitute for the real mark.
  */
+
+const WORDMARK_SOURCES = ["/logo.svg", "/logo.png", "/logo.webp"];
+const MARK_SOURCES = ["/logo-mark.svg", "/logo-mark.png", "/logo-mark.webp"];
 
 function DrawnWordmark({ className }: { className: string }) {
   return (
@@ -45,38 +48,40 @@ function DrawnMark({ className }: { className: string }) {
   );
 }
 
-/** Full lockup: X1 monogram plus the VAULT wordmark. */
-export function Wordmark({ className = "h-7 w-auto" }: { className?: string }) {
-  const [useFile, setUseFile] = useState(true);
+/** Steps through candidate files, then gives up to the drawn version. */
+function AssetOrFallback({
+  sources,
+  className,
+  Fallback,
+}: {
+  sources: string[];
+  className: string;
+  Fallback: ({ className }: { className: string }) => React.ReactElement;
+}) {
+  const [index, setIndex] = useState(0);
 
-  if (useFile) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src="/logo.svg"
-        alt="X1 Vault"
-        className={className}
-        onError={() => setUseFile(false)}
-      />
-    );
-  }
-  return <DrawnWordmark className={className} />;
+  if (index >= sources.length) return <Fallback className={className} />;
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      key={sources[index]}
+      src={sources[index]}
+      alt="X1 Vault"
+      className={className}
+      onError={() => setIndex((i) => i + 1)}
+    />
+  );
 }
 
-/** Monogram only, for tight spots like the mobile header. */
-export function LogoMark({ className = "h-6 w-auto" }: { className?: string }) {
-  const [useFile, setUseFile] = useState(true);
+/** Full lockup, for the sidebar. */
+export function Wordmark({ className = "h-7 w-auto" }: { className?: string }) {
+  return (
+    <AssetOrFallback sources={WORDMARK_SOURCES} className={className} Fallback={DrawnWordmark} />
+  );
+}
 
-  if (useFile) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src="/logo-mark.svg"
-        alt="X1 Vault"
-        className={className}
-        onError={() => setUseFile(false)}
-      />
-    );
-  }
-  return <DrawnMark className={className} />;
+/** Monogram only, for the mobile header and other tight spots. */
+export function LogoMark({ className = "h-6 w-auto" }: { className?: string }) {
+  return <AssetOrFallback sources={MARK_SOURCES} className={className} Fallback={DrawnMark} />;
 }

@@ -1,25 +1,43 @@
 # Brand assets
 
-Two files are picked up automatically by `src/components/Logo.tsx` when
-present. Neither is committed yet, because the originals have not been
-handed over.
+`src/components/Logo.tsx` picks these up automatically. Nothing is committed
+yet, because the originals have not been handed over; until then the app
+falls back to a drawn approximation, which is a placeholder and not the
+brand.
 
-| File | Used for | Notes |
+| Slot | Files tried, in order | Used for |
 |---|---|---|
-| `logo.svg` | Full lockup (sidebar) | X1 monogram + VAULT wordmark |
-| `logo-mark.svg` | Monogram only (mobile header) | Just the X1 |
+| Wordmark | `logo.svg`, `logo.png`, `logo.webp` | Sidebar lockup |
+| Mark | `logo-mark.svg`, `logo-mark.png`, `logo-mark.webp` | Mobile header, tight spots |
 
-Until they exist, the app falls back to a drawn approximation in
-`Logo.tsx`. That fallback is a placeholder, not the brand — replace it.
+Drop a file in and commit. No code change needed.
 
-## Getting the real files in
+## Two logos, not one
 
-Drop both into this directory and commit. No code change is needed; the
-component tries the file first and only falls back when it 404s.
+Marketing artwork and interface chrome have different jobs, and one file
+rarely does both well.
 
-A note on colour: the logo is designed on near-black. The app renders on a
-light surface by default, so **export the artwork with the black background
-removed** and the wordmark in a single flat colour — the component tints it
-via CSS so it inverts correctly in both themes. If your only copy has the
-black background baked in, a PNG will still work but will show a black box
-on the light theme.
+**A detailed 3D or rendered logo** belongs on the X profile, the grant
+application, a README banner, social cards — anywhere it appears at 200px or
+larger and can be looked at.
+
+**Interface chrome needs a flat, simplified mark.** In the sidebar the
+wordmark renders about 28px tall and the favicon is 32px or less. At that
+size, bevels, gradients, glows and background shading all collapse into
+mud. What survives is a silhouette.
+
+So the asset in `logo.svg` should be the *simplified* version: flat, few
+colours, no background, legible at 28px. Keep the rendered one for
+marketing.
+
+## Export requirements for the chrome asset
+
+1. **Transparent background.** The app renders on a light surface by default
+   and a dark one in dark mode. Artwork with a baked-in background shows as
+   a rectangle against whichever theme it does not match.
+2. **Wide, not square.** The sidebar slot is a horizontal lockup. A square
+   or near-square image is scaled to the row height and ends up tiny.
+3. **SVG if at all possible.** A raster at 28px on a 3× display needs about
+   84px of real pixels; anything smaller looks soft.
+4. **Check it at size.** Shrink the file to 28px tall and look at it. If you
+   cannot tell what it is, the interface cannot either.
