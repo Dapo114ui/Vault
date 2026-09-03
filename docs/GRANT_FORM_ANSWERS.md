@@ -211,8 +211,13 @@ $50k-$100k
 
 ```
 TOTAL REQUESTED: $68,000
-Upfront on signature (20%): $13,600
-Milestone-gated (80%): $54,400 across four milestones
+  Upfront on signature (20%):            $13,600
+  Milestone 1 — Trading integration:     $12,000
+  Milestone 2 — Audit engagement:        $16,000
+  Milestone 3 — Audit remediation:       $14,400
+  Milestone 4 — Indexing and adoption:   $12,000
+  Milestones subtotal (80%):             $54,400
+  TOTAL:                                 $68,000
 
 Allocation by purpose:
   Security audit and remediation    $40,000   59%
@@ -240,32 +245,36 @@ payment schedule to a date outside our control would not be honest.
 
 ## Milestone 1
 
+Format matched to the form: Name, Description, Deliverables & Success
+Metrics/KPIs, Estimated Completion Date, Amount Requested.
+
 ```
 Milestone Name: Trading Integration & Testnet Launch
 
-Budget: $12,000
-Timeline: days 1–25 (1–25 October 2026)
+Description: Switch trading on. The integration code is already written; what
+is missing is confirmation of an external interface. We verify Ecodex's
+deployed router ABI against our IEcodexRouter interface and correct it if it
+differs, integrate DIA price feeds for non-base assets using the oracle
+staleness rejection already implemented in the contracts, and redeploy the
+factory carrying the operator allowlist, deploy-parameter bounds, deposit cap
+and emergency pause. The goal is a vault that trades through Ecodex with its
+risk caps demonstrably enforcing.
 
-Key activities:
-- Verify Ecodex's deployed router ABI against our IEcodexRouter interface,
-  and correct the interface if it differs.
-- Integrate DIA price feeds for non-base assets, using the oracle staleness
-  rejection already implemented in the contracts.
-- Redeploy the factory carrying the operator allowlist, deploy-parameter
-  bounds, deposit cap and emergency pause.
+Deliverables & Success Metrics/KPIs:
+- A trading-enabled vault live on the Maculatus testnet, address published in
+  the public repository.
+- >= 25 SwapExecuted events emitted by that vault.
+- All three risk caps — position size, single-asset exposure, drawdown —
+  each shown reverting a deliberate breach, with a linkable transaction hash
+  for each.
+- Ecodex router interface either confirmed unchanged or corrected, with the
+  diff public.
+Every metric above is verifiable on-chain by a reviewer; none depends on our
+own reporting.
 
-Deliverables:
-- A trading-enabled vault live on the Maculatus testnet.
-- Redeployed factory and vault addresses published in the public repository.
-- Transaction hashes demonstrating each of the three risk caps reverting a
-  deliberate breach.
+Estimated Completion Date: 25 October 2026
 
-Success criteria (measurable, on-chain):
-- >= 25 SwapExecuted events emitted by a public testnet vault.
-- All three risk caps (position size, single-asset exposure, drawdown) shown
-  reverting a breach, each with a linkable transaction.
-- Router interface either confirmed unchanged or corrected, with the diff
-  public.
+Amount Requested: $12,000
 ```
 
 ## Milestone 2
@@ -273,24 +282,24 @@ Success criteria (measurable, on-chain):
 ```
 Milestone Name: Security Audit — Engagement & Review
 
-Budget: $16,000
-Timeline: days 15–55 (15 October – 25 November 2026)
+Description: Put the contracts in front of an independent firm. We engage a
+named auditor scoped to all five contracts — Vault, ShareToken, RiskManager,
+StrategyExecutor and VaultFactory — freeze the code at the audited commit and
+publish its hash, then support the review through to a draft report. This is
+the largest single cost in the request and the main reason for it: the
+protocol holds other people's money and has not yet been independently
+reviewed.
 
-Key activities:
-- Engage a named audit firm, scoped to Vault, ShareToken, RiskManager,
-  StrategyExecutor and VaultFactory.
-- Freeze the code at the audited commit and publish its hash.
-- Support the review and answer the firm's queries.
+Deliverables & Success Metrics/KPIs:
+- Signed engagement with a named audit firm, letter published.
+- Audited commit hash published in the repository, so the reviewed code is
+  identifiable and frozen.
+- Draft report received, with findings counted by severity.
+- Scope confirmed as all five contracts rather than a subset.
 
-Deliverables:
-- Signed engagement with a named firm.
-- Audited commit hash published in the repository.
-- Draft audit report received.
+Estimated Completion Date: 25 November 2026
 
-Success criteria:
-- Engagement letter and audited commit hash public and linkable.
-- Draft report delivered, with findings counted by severity.
-- Scope confirmed to cover all five contracts, not a subset.
+Amount Requested: $16,000
 ```
 
 ## Milestone 3
@@ -298,24 +307,23 @@ Success criteria:
 ```
 Milestone Name: Audit Remediation & Publication
 
-Budget: $14,400
-Timeline: days 55–80 (25 November – 20 December 2026)
+Description: Fix what the audit finds, in public. Every critical and high
+finding is addressed as a discrete commit referencing the finding it fixes,
+each with a regression test added to the suite, and the firm signs off on the
+remediation. The final report is published in the public repository rather
+than summarised — a report nobody can read is not an audit anyone should
+trust.
 
-Key activities:
-- Fix every critical and high finding, each as a discrete commit referencing
-  the finding it addresses.
-- Add a regression test for each finding.
-- Obtain the firm's sign-off on the remediation.
-
-Deliverables:
-- Final audit report published in the public repository.
-- Remediation commits, individually linked to findings.
-- An expanded test suite covering every finding.
-
-Success criteria:
+Deliverables & Success Metrics/KPIs:
+- Final audit report published in the public repository and linkable.
 - Zero unresolved critical or high findings at sign-off.
-- Final report public and linkable.
-- Test count increased, with a named regression test per finding.
+- One remediation commit per finding, each referencing it.
+- Test suite expanded with a named regression test per finding; current
+  count is 40 passing tests.
+
+Estimated Completion Date: 20 December 2026
+
+Amount Requested: $14,400
 ```
 
 ## Milestone 4
@@ -323,28 +331,29 @@ Success criteria:
 ```
 Milestone Name: Indexing, Operator Onboarding & Adoption
 
-Budget: $12,000
-Timeline: days 60–100 (1 December 2026 – 8 January 2027)
+Description: Turn a working protocol into a used one. We build a subgraph or
+indexer so vault performance history survives beyond an RPC's log window,
+write operator documentation good enough to run a vault unaided, onboard
+external strategy operators to the allowlist, and run a depositor acquisition
+campaign — ideally as an X1 Galxe Starboard quest, which puts real testnet
+users through the contracts using X1's own distribution. Operators are the
+efficient path here: each arrives with their own following, so onboarding
+operators is cheaper than acquiring depositors one at a time.
 
-Key activities:
-- Build a subgraph or indexer so vault performance history survives beyond an
-  RPC's log window.
-- Write operator documentation sufficient to run a vault unaided.
-- Onboard external strategy operators to the allowlist.
-- Run a depositor acquisition campaign, ideally as an X1 Galxe Starboard
-  quest.
-
-Deliverables:
-- Indexed performance history queryable for every vault since deployment.
-- Public operator documentation.
-- Independent operators live with vaults they deployed themselves.
-
-Success criteria (measurable, on-chain):
-- >= 2 independent operators running vaults they deployed.
+Deliverables & Success Metrics/KPIs:
+- >= 2 independent operators running vaults they deployed themselves.
 - >= 5 vaults deployed by the factory.
 - >= 100 distinct depositor addresses.
 - >= 400 cumulative deposit transactions.
-- Performance history available for every vault from its deployment block.
+- Indexed performance history queryable for every vault from its deployment
+  block onward.
+- Public operator documentation.
+All adoption metrics are countable from the factory's VaultDeployed events
+and each vault's Deposit, Withdraw and SwapExecuted events.
+
+Estimated Completion Date: 8 January 2027
+
+Amount Requested: $12,000
 ```
 
 > **Cash flow, worth raising in the application rather than discovering at
@@ -357,11 +366,6 @@ Success criteria (measurable, on-chain):
 ## Still needed from you
 
 - **Project X handle** — required field.
-- **The rest of the Milestone Format spec.** The form lists a format under
-  "Milestone 1" and only the first line is visible ("Milestone Name: A short,
-  clear title…"). My blocks cover name, budget, timeline, activities,
-  deliverables and success criteria, which should span whatever it asks —
-  but scroll so the full spec shows and I will match it line for line.
 - **Anything between "Project X" and "Previous Funding"**, and anything after
   Milestone 4. Team background and a payout wallet are almost certainly
   there.
