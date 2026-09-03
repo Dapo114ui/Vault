@@ -14,7 +14,7 @@ Category: **Finance & Commerce (DeFi)** · Form:
 
 | | |
 |---|---|
-| Applicant | `[TO FILL]` — name / entity, and whether solo or a team |
+| Applicant | `[TO FILL]` — your name and your designer's; two people, no entity |
 | Contact | `[TO FILL]` — email, Telegram or X handle |
 | Payout address | `[TO FILL]` — **a fresh wallet**, not the testnet deployer |
 | Amount requested | `[TO FILL]` — see *Budget*, which proposes $68,000 |
@@ -284,7 +284,12 @@ returns, and the interface says so rather than advertising a projected APY.
 
 ## Team
 
-`[TO FILL]` — who is building this, relevant background, and prior shipped
-work. If solo, say so: a working deployed protocol with a passing test suite
-is itself the strongest evidence available, and reviewers respond better to
-a straightforward account than to an inflated one.
+Two people, no company. `[TO FILL — applicant name]` writes the contracts,
+the test suite and the application; `[TO FILL — designer name]` handles
+design and interface work. Everything below the surface of this application
+was built by the two of us before applying and at our own cost.
+
+Stated plainly because it is checkable: neither of us arrives with an
+audited protocol behind us. What we bring instead is this one — deployed,
+public, and reconciling on-chain — which is a stronger claim than a résumé
+about work nobody can inspect.
