@@ -162,12 +162,125 @@ this application: `https://github.com/Dapo114ui/Vault`
 
 ---
 
+## Previous Funding
+
+Dropdown. Choose:
+
+```
+Self-Funding
+```
+
+Accurate, and it does not trigger the follow-up detail prompt (only Grant,
+Angel Investment, Pre-Seed, Seed and Series A do). Everything so far —
+contracts, tests, deployment, frontend — was built and paid for by you, with
+no outside money. "No Funding" is also literally true but reads as *nobody
+has ever backed this*; "Self-Funding" says *I put my own resources in*, which
+is the same fact framed as commitment.
+
+If a follow-up field appears anyway, the answer is: no external entity, no
+round, $0 raised; development to date funded personally.
+
+## Grant Budget Structure & Milestones
+
+The form asks for four milestones, each with deliverables, measurable success
+criteria and an allocated budget, against an upfront of up to 20%.
+
+```
+TOTAL REQUESTED: $68,000
+Upfront on signature (20%): $13,600
+Milestone-gated (80%): $54,400
+
+The audit is 59% of this request and is the reason for it. The engineering
+it reviews is already written and deployed — see Phase 0 in the technical
+roadmap — so this budget is not asking to build the protocol. It is asking
+to get it independently reviewed, switched on, and put in front of users.
+
+UPFRONT — $13,600 (20%)
+Purpose: audit-firm deposit and Phase 1 integration work. Audit firms
+require a deposit at engagement, so the upfront is what makes Milestone 2
+startable rather than being profit taken early.
+
+MILESTONE 1 — TRADING LIVE ON TESTNET
+Budget: $12,000 · Target: day 25 (25 October 2026)
+Deliverables:
+  - Ecodex router ABI verified against our IEcodexRouter interface, and the
+    interface corrected if it differs.
+  - DIA price feeds wired for non-base assets, with the staleness rejection
+    already implemented in the contracts.
+  - Factory redeployed carrying the operator allowlist, deploy-parameter
+    bounds, deposit cap and pause.
+  - A trading-enabled vault live on Maculatus.
+Success criteria (all verifiable on-chain):
+  - >= 25 SwapExecuted events emitted by a public testnet vault.
+  - All three risk caps demonstrated reverting a deliberate breach, with
+    transaction hashes published.
+  - Redeployed factory address published in the repository.
+
+MILESTONE 2 — SECURITY AUDIT ENGAGED AND DRAFT RECEIVED
+Budget: $16,000 · Target: day 55 (25 November 2026)
+Deliverables:
+  - Signed engagement with a named audit firm, scope covering Vault,
+    ShareToken, RiskManager, StrategyExecutor and VaultFactory.
+  - Code freeze at the audited commit, hash published.
+  - Draft report received from the firm.
+Success criteria:
+  - Engagement letter and audited commit hash published in the repository.
+  - Draft report delivered, with findings counted by severity.
+
+MILESTONE 3 — AUDIT REMEDIATED AND PUBLISHED
+Budget: $14,400 · Target: day 80 (20 December 2026)
+Deliverables:
+  - Every critical and high finding fixed, each as a discrete commit
+    referencing the finding.
+  - Firm's sign-off on the remediation.
+  - Final report published in the public repository.
+Success criteria:
+  - Zero unresolved critical or high findings.
+  - Final report and remediation commits public and linkable.
+  - Test count increased to cover each finding's regression case.
+
+MILESTONE 4 — INDEXING, OPERATORS AND MEASURABLE ACTIVITY
+Budget: $12,000 · Target: day 100 (8 January 2027)
+Deliverables:
+  - Subgraph or indexer serving vault performance history beyond an RPC's
+    log window.
+  - Operator documentation sufficient to run a vault without our help.
+  - External strategy operators onboarded to the allowlist.
+Success criteria (all verifiable on-chain):
+  - >= 2 independent operators running vaults they deployed themselves.
+  - >= 5 vaults deployed by the factory.
+  - >= 100 distinct depositor addresses.
+  - >= 400 cumulative deposit transactions.
+  - Performance history queryable for every vault since deployment.
+
+All success criteria above are checkable by anyone from the factory's
+VaultDeployed events and each vault's Deposit, Withdraw and SwapExecuted
+events. None depend on our own reporting.
+
+Note on X1 mainnet: no milestone is gated on it. X1's mainnet target has
+moved, and we will not tie a payment schedule to a date outside our control.
+Mainnet deployment follows within three weeks of Ecodex having live mainnet
+liquidity, whenever that is.
+```
+
+> **One thing to weigh.** The audit is the largest cost and the deposit falls
+> at engagement, but 80% of the grant arrives only on milestone completion.
+> The $13,600 upfront is sized to cover an audit deposit plus Phase 1 — if
+> your chosen firm wants more than that up front, either say so in the
+> application and ask for a higher upfront, or plan to bridge it. Better to
+> raise it now than to miss Milestone 2 on cash flow.
+
 ## Still needed from you
 
 - **Project X handle** — required field, see above.
-- **Everything below the fold.** The form continues past "Project X"; send a
-  screenshot of the remaining fields and I will draft those too. Expect team
-  background, requested amount, wallet address, and possibly KYC questions.
+- **Two labels I cannot read.** In the funding screenshot one field starts
+  "Fu…" — its helper text is "…funding including entity name, amount, and
+  round type", so that is the conditional follow-up and stays empty once
+  Self-Funding is selected. Another starts "R…". Scroll so both labels show
+  and I will draft them.
+- **The gap between "Project X" and "Previous Funding"**, and anything after
+  the milestones block. Team background and a payout wallet are almost
+  certainly in there.
 
 ## Facts to have ready for later fields
 

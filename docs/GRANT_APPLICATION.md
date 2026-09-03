@@ -182,27 +182,46 @@ documentation and onboarding for the first external strategy operators.
 having live mainnet liquidity. Stated as a dependency rather than a date,
 because it is one.
 
-## Budget — $68,000 requested
+## Budget — $68,000, structured against four milestones
 
 `[TO FILL: adjust to your actual costs and time]`
 
-The ask is lower than the engineering-heavy figure this project would have
-asked for a month ago, because a month ago the engineering had not been done.
-What remains is dominated by the one thing that cannot be self-served: an
-independent security review of a protocol that holds other people's money.
+The program pays up to 20% on signature with the remainder tied to
+milestones, so the request is structured that way rather than as line items.
 
-| Line | Amount | Note |
+| | Target | Amount |
 |---|---|---|
-| Security audit and remediation | $40,000 | 59% of the request. More surface than the original scope, since the allowlist, bounds and guards all ship into it |
-| Engineering — Phase 1 and Phase 3 | $12,000 | Router/oracle integration, then the indexer |
-| Indexing and infrastructure | $6,000 | Subgraph hosting, monitoring, RPC |
-| Go-to-market and operator onboarding | $10,000 | The weakest part of this application and the part code cannot fix — see *Go-to-market* |
-| **Total** | **$68,000** | |
+| Upfront on signature (20%) | day 0 | $13,600 |
+| **M1** — Trading live on testnet | day 25 | $12,000 |
+| **M2** — Audit engaged, draft report received | day 55 | $16,000 |
+| **M3** — Findings remediated, report published | day 80 | $14,400 |
+| **M4** — Indexer live, two external operators, activity targets met | day 100 | $12,000 |
+| **Total** | | **$68,000** |
 
-The floor that still produces something worth having is **$42,000** — audit
-and remediation alone, with Phase 1 absorbed by us as Phase 0 was. Below
-that the audit cannot be paid for, and shipping an unaudited vault that holds
-other people's money is not something we are willing to do.
+Every milestone's success criteria are verifiable on-chain by anyone, from
+the factory's `VaultDeployed` events and each vault's `Deposit`, `Withdraw`
+and `SwapExecuted` events. None depend on our own reporting. The full
+criteria are in `GRANT_FORM_ANSWERS.md`.
+
+The audit is roughly 59% of the request across M2 and M3, and it is the
+reason for the request. The engineering it reviews is already written and
+deployed — this budget is not asking to build the protocol, but to get it
+independently reviewed, switched on, and put in front of users.
+
+The ask is lower than this project would have made a month ago, because a
+month ago the engineering had not been done. The floor that still produces
+something worth having is **$42,000** — audit and remediation alone, with
+Phase 1 absorbed by us as Phase 0 was. Below that the audit cannot be paid
+for, and shipping an unaudited vault that holds other people's money is not
+something we are willing to do.
+
+**On cash flow, stated plainly:** audit firms take a deposit at engagement,
+and 80% of this grant arrives only on completion. The upfront is sized to
+cover that deposit plus Phase 1. If a firm's terms require more, we would
+rather raise it in the application than miss M2 on timing.
+
+No milestone is gated on X1 mainnet. Its target has moved, and tying a
+payment schedule to a date outside our control would be dishonest.
 
 ## Go-to-market
 
